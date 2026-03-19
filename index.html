@@ -443,8 +443,8 @@
 
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   QUESTION POOL — 10 possible questions, each scored against
-   the user's idea text. Only relevant ones are shown.
+   QUESTION POOL — scored against the user's idea text.
+   Only relevant ones are shown.
 ═══════════════════════════════════════════════════════════════ */
 const Q_POOL = [
   {
@@ -513,7 +513,7 @@ const Q_POOL = [
     icon: '🚧',
     label: 'Key Rules & Constraints',
     question: 'Are there hard rules, limits, or things it must never do?',
-    hint: 'Brand guidelines, compliance rules, restricted topics, required disclaimers. One per line.',
+    hint: 'Hard rules Claude must always follow — brand guidelines, compliance limits, required disclaimers, things it must never say. One rule per line.',
     type: 'textarea',
     placeholder: 'Never discuss competitor pricing\nAlways add a legal disclaimer for financial advice\nOnly respond in formal English\nEscalate unresolved billing issues to billing@company.com',
     keywords: ['rule','constraint','limit','must','never','always','policy','compliance','brand','guideline','restrict','avoid','prohibit','require','legal','privacy','confidential','safety','regulated','restricted','boundary','limit'],
@@ -567,6 +567,30 @@ const Q_POOL = [
     keywords: ['language','multilingual','international','global','translate','spanish','french','hindi','arabic','chinese','japanese','localize','regional','bilingual','non-english','multiple language'],
     anti: [],
     base: 0
+  },
+  {
+    id: 'example_io',
+    icon: '✨',
+    label: 'Ideal Example (Few-Shot)',
+    question: 'Show us a perfect exchange — a sample input and the ideal response.',
+    hint: 'This is the single highest-impact addition. Claude learns from examples far better than instructions alone. Even one example dramatically improves output quality and consistency.',
+    type: 'textarea',
+    placeholder: 'User: "I was charged twice last month and I need a refund."\n\nIdeal response: "I\'m really sorry about that — I can see the duplicate charge on your account. I\'ve processed a full refund right now, and you\'ll see it within 3–5 business days. Is there anything else I can help you with?"',
+    keywords: ['chatbot','assistant','support','agent','coach','advisor','tutor','guide','writer','content','email','sales','customer','respond','help users','answer'],
+    anti: ['pipeline','batch','sql','data analysis','extract data','convert','classify'],
+    base: 3
+  },
+  {
+    id: 'failure_modes',
+    icon: '⚠️',
+    label: 'Failure Modes to Avoid',
+    question: 'What are the most common ways this AI might go wrong?',
+    hint: 'Naming failure modes explicitly makes Claude far less likely to commit them. Think about past AI mistakes or things you definitely want to prevent.',
+    type: 'textarea',
+    placeholder: 'Giving vague, non-committal answers when the user needs a clear decision\nPromising outcomes (like a refund) without verifying eligibility first\nUsing technical jargon with non-technical users\nApologising excessively instead of just solving the problem',
+    keywords: ['chatbot','support','agent','assistant','coach','advisor','tutor','sales','writer','content','customer','help users','answer','respond'],
+    anti: ['pipeline','batch','sql','data analysis'],
+    base: 2
   }
 ];
 
@@ -581,15 +605,20 @@ function scoreQ(q, idea) {
 
 function getRelevantQuestions(idea) {
   const MIN = 2;
-  const MAX = 8;
+  const MAX = 10;
   const scored = Q_POOL
     .map(q => ({ ...q, score: scoreQ(q, idea) }))
     .filter(q => q.score >= MIN);
 
-  // format always included; sort rest by score desc
-  const fmt   = scored.find(q => q.id === 'format');
-  const rest  = scored.filter(q => q.id !== 'format').sort((a,b) => b.score - a.score);
-  const picked = rest.slice(0, MAX - 1);
+  // format always included; example_io + failure_modes prioritised high; sort rest by score desc
+  const fmt     = scored.find(q => q.id === 'format');
+  const example = scored.find(q => q.id === 'example_io');
+  const failure = scored.find(q => q.id === 'failure_modes');
+  const pinned  = [example, failure].filter(Boolean);
+  const rest    = scored
+    .filter(q => !['format','example_io','failure_modes'].includes(q.id))
+    .sort((a,b) => b.score - a.score);
+  const picked  = [...rest.slice(0, MAX - pinned.length - 1), ...pinned];
   if (fmt) picked.push(fmt);
   return picked;
 }
@@ -750,81 +779,113 @@ function collectAnswers() {
 function generatePrompt() {
   const idea = document.getElementById('ideaInput').value.trim();
   const ans  = collectAnswers();
+  const ctx  = detectContext(idea);
 
-  const persona   = ans.persona   || '';
-  const audience  = ans.audience  || '';
-  const tone      = ans.tone      || '';
-  const useDoc    = !!ans.document;
-  const docLabel  = ans.document  || 'reference document';
-  const domain    = ans.domain    || '';
-  const rules     = ans.constraints || '';
-  const format    = ans.format    || '';
-  const length    = ans.length    || '';
-  const escalation = ans.escalation || '';
-  const language  = ans.language  || '';
+  const persona      = ans.persona      || '';
+  const audience     = ans.audience     || '';
+  const tone         = ans.tone         || '';
+  const useDoc       = !!ans.document;
+  const docLabel     = ans.document     || 'reference document';
+  const domain       = ans.domain       || '';
+  const rules        = ans.constraints  || '';
+  const format       = ans.format       || '';
+  const length       = ans.length       || '';
+  const escalation   = ans.escalation   || '';
+  const language     = ans.language     || '';
+  const exampleIO    = ans.example_io   || '';
+  const failureModes = ans.failure_modes || '';
 
-  const personaName = persona ? persona.split(',')[0].trim() : 'AI Assistant';
+  /* Detect context type for context-aware sections */
+  const isAgent   = /Conversational|Support|Sales|Education|Coaching/i.test(ctx);
+  const isWriter  = /Content|Writing/i.test(ctx);
+  const isDev     = /Developer/i.test(ctx);
+  const isData    = /Data|Automation/i.test(ctx);
+
   const parts = [];
 
-  /* [Task Context] */
-  let ctx = `[Task Context]\n`;
-  ctx += persona
-    ? `You will act as ${persona}.\n`
-    : `You are a helpful AI assistant.\n`;
-  ctx += `Your primary goal: ${idea}.\n`;
-  if (audience)  ctx += `You are responding to: ${audience}.\n`;
-  if (domain)    ctx += `You draw on expertise in: ${domain}.\n`;
-  parts.push(ctx.trim());
+  /* ── <role_and_goal> ── */
+  let roleLines = '';
+  roleLines += persona ? `You are ${persona}.\n` : `You are a helpful AI assistant.\n`;
+  roleLines += `Your job: ${idea}\n`;
+  if (audience) roleLines += `You are responding to: ${audience}.\n`;
+  if (domain)   roleLines += `You draw on deep expertise in: ${domain}.\n`;
+  if (language) roleLines += `Always respond in: ${language}.\n`;
+  parts.push(`<role_and_goal>\n${roleLines.trim()}\n</role_and_goal>`);
 
-  /* [Tone] */
+  /* ── <tone> ── */
   if (tone) {
-    parts.push(`[Tone]\nMaintain a ${tone.toLowerCase()} throughout every interaction. This should be consistent regardless of the topic or complexity of the request.`);
+    parts.push(`<tone>\nMaintain a ${tone.toLowerCase()} in every interaction — regardless of how simple or complex the request is. Your tone is part of your identity, not just a style choice.\n</tone>`);
   }
 
-  /* [Language] */
-  if (language) {
-    parts.push(`[Language]\n${language}.`);
-  }
-
-  /* [Data / Docs] */
+  /* ── <knowledge_base> ── */
   if (useDoc) {
-    parts.push(`[Data / Docs]\nHere is the ${docLabel} you must consult when formulating responses:\n<guide>\n{{DOCUMENT}}\n</guide>\nAlways prioritise this document over your general knowledge. If the document doesn't cover a question, say so clearly.`);
+    parts.push(`<knowledge_base>\nAlways consult the following ${docLabel} before responding. Prioritise it over your general knowledge.\n<document>\n{{DOCUMENT}}\n</document>\nIf the document does not cover the user's question, say so explicitly — do not infer or fabricate an answer.\n</knowledge_base>`);
   }
 
-  /* [Rules] */
-  const baseRules = [
-    `- If you are unsure how to respond, say: "I'm not sure about that — could you clarify what you need?"`,
-    `- If a question is outside your scope, politely redirect the user back to your area of focus.`
-  ];
-  if (escalation) baseRules.push(`- ${escalation}`);
+  /* ── <examples> (few-shot) ── */
+  if (exampleIO) {
+    parts.push(`<examples>\nHere is an example of an ideal interaction. Use this as your quality bar — match the style, depth, and tone in your own responses.\n\n${exampleIO.trim()}\n</examples>`);
+  }
+
+  /* ── <rules> ── */
   const userRules = rules
-    ? rules.split('\n').filter(r => r.trim()).map(r => `- ${r.trim()}`)
+    ? rules.split('\n').filter(r => r.trim()).map(r => `- ${r.replace(/^-\s*/,'').trim()}`)
     : [];
-  const allRules = [...userRules, ...baseRules].join('\n');
-  parts.push(`[Rules]\nHere are the important rules for every interaction:\n${allRules}`);
-
-  /* [History + Question] */
-  parts.push(`[History]\nConversation history (may be empty on first message):\n<history>\n{{HISTORY}}\n</history>\n\nUser's current message:\n<question>\n{{QUESTION}}\n</question>`);
-
-  /* [Immediate Request] */
-  parts.push(`[Immediate Request]\nHow do you respond to the user's message as ${personaName}?`);
-
-  /* [Think step by step] */
-  parts.push(`[Think step by step]\nBefore replying, think through: the user's actual need, the relevant rules, and the best way to help. Then respond.`);
-
-  /* [Format] */
-  let fmtBlock = '[Format]\n';
-  if (format === 'Response wrapped in <response> tags' || format === 'XML tags') {
-    fmtBlock += 'Wrap your response in <response></response> tags.';
-  } else if (format) {
-    fmtBlock += `Format: ${format}.`;
-  } else {
-    fmtBlock += 'Wrap your response in <response></response> tags.';
+  if (escalation) userRules.push(`- ${escalation.replace(/^-\s*/,'')}`);
+  /* Only add agent-specific fallback rules for conversational/support contexts */
+  if (isAgent && !isDev && !isData) {
+    userRules.push(`- If you are genuinely uncertain, say so clearly and offer a next step rather than guessing.`);
+    userRules.push(`- If a request is outside your scope, acknowledge it and redirect the user helpfully.`);
   }
-  if (length) fmtBlock += `\nLength: ${length}.`;
-  parts.push(fmtBlock);
+  if (userRules.length) {
+    parts.push(`<rules>\n${userRules.join('\n')}\n</rules>`);
+  }
 
-  const fullPrompt = parts.join('\n\n---\n\n');
+  /* ── <avoid> (failure modes) ── */
+  if (failureModes) {
+    const failLines = failureModes.split('\n').filter(f => f.trim())
+      .map(f => `- ${f.replace(/^-\s*/,'').trim()}`).join('\n');
+    parts.push(`<avoid>\nThese are known failure modes — actively avoid them in every response:\n${failLines}\n</avoid>`);
+  }
+
+  /* ── Input placeholders — context-aware ── */
+  if (isDev) {
+    parts.push(`<code_to_review>\n{{CODE}}\n</code_to_review>\n\n<request>\n{{QUESTION}}\n</request>`);
+  } else if (isData && !isAgent) {
+    parts.push(`<input_data>\n{{INPUT}}\n</input_data>\n\n<task>\n{{TASK}}\n</task>`);
+  } else if (isWriter && !isAgent) {
+    parts.push(`<brief>\n{{BRIEF}}\n</brief>`);
+  } else {
+    /* Default: conversational agent */
+    parts.push(`<conversation_history>\nPrior messages (empty on first turn):\n{{HISTORY}}\n</conversation_history>\n\n<user_message>\n{{QUESTION}}\n</user_message>`);
+  }
+
+  /* ── <thinking> — context-specific CoT ── */
+  let thinkLines = '';
+  if (isDev) {
+    thinkLines = `Before responding, work through:\n1. What is the code actually doing, and what is the author's intent?\n2. Are there security vulnerabilities, performance issues, or correctness bugs?\n3. What is the clearest, most actionable way to explain each finding?\n4. Is the suggested fix idiomatic, minimal, and safe?`;
+  } else if (isWriter) {
+    thinkLines = `Before writing, think through:\n1. What is the core message or goal of this piece?\n2. Who is the reader and what do they care about most?\n3. What structure, length, and format will serve them best?\n4. Does the draft match the required tone and brand voice?`;
+  } else if (isData) {
+    thinkLines = `Before responding, reason through:\n1. What is the precise task or transformation required?\n2. Are there edge cases or data quality issues to handle?\n3. What is the clearest and most efficient approach?\n4. Does the output format match what's expected downstream?`;
+  } else {
+    thinkLines = `Before responding, work through:\n1. What does the user actually need — not just what they literally said?\n2. Which rules or constraints apply to this specific situation?\n3. Have I checked the knowledge base (if provided) before answering from memory?\n4. What is the most helpful, accurate, and on-brand response I can give?`;
+  }
+  parts.push(`<thinking>\n${thinkLines}\n</thinking>`);
+
+  /* ── <output_format> ── */
+  let fmtLines = '';
+  if (format === 'Response wrapped in <response> tags' || format === 'XML tags') {
+    fmtLines = `Wrap your final answer in <response></response> tags.`;
+  } else if (format) {
+    fmtLines = `Format your response as: ${format}.`;
+  } else {
+    fmtLines = `Wrap your final answer in <response></response> tags.`;
+  }
+  if (length) fmtLines += `\nTarget length: ${length}.`;
+  parts.push(`<output_format>\n${fmtLines}\n</output_format>`);
+
+  const fullPrompt = parts.join('\n\n');
   const prefill    = (format === 'Response wrapped in <response> tags')
     ? '\n\n---\n\nAssistant (prefill):\n<response>'
     : '';
@@ -832,12 +893,10 @@ function generatePrompt() {
 
   /* meta */
   const tokens  = Math.round(final.length / 4);
-  const docFlag = useDoc ? '<span>📎 {{DOCUMENT}}</span>' : '';
-  document.getElementById('promptMeta').innerHTML = `
-    <span>📐 ~${tokens} tokens</span>
-    <span>📝 ${parts.length} sections</span>
-    ${docFlag}
-    <span>🔢 {{HISTORY}} + {{QUESTION}}</span>`;
+  const docFlag = useDoc ? ' · <span>📎 {{DOCUMENT}}</span>' : '';
+  const exFlag  = exampleIO ? ' · <span>✨ few-shot</span>' : '';
+  document.getElementById('promptMeta').innerHTML =
+    `<span>📐 ~${tokens} tokens</span><span>📝 ${parts.length} sections</span>${docFlag}${exFlag}`;
 
   document.getElementById('promptOutput').textContent = final;
   showStep(3);

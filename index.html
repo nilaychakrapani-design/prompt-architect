@@ -6,267 +6,239 @@
   <title>Prompt Architect — Claude Prompt Generator</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    /* ─── RESET & BASE ─────────────────────────────────────────── */
+    /* ─── RESET ─────────────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ─── DESIGN TOKENS (SaaS Flat — UI/UX Pro Max) ─────────────── */
     :root {
-      --brand:        #E8714A;
-      --brand-dark:   #C4562F;
-      --brand-light:  #FF8F68;
-      --brand-lt:     #FDF0EB;
-      --brand-border: rgba(232,113,74,.2);
-      --bg:           #F6F4F1;
-      --bg-2:         #EFECE8;
-      --card:         #FFFFFF;
-      --border:       #E4DFD8;
-      --border-light: #EDE9E3;
-      --text:         #1C1916;
-      --text-2:       #3D3733;
-      --muted:        #7A7370;
-      --success:      #1E7A4A;
-      --success-lt:   #E8F5EE;
-      --radius:       14px;
-      --radius-sm:    8px;
-      --shadow-sm:    0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
-      --shadow:       0 4px 16px rgba(0,0,0,.07), 0 1px 4px rgba(0,0,0,.04);
-      --shadow-lg:    0 12px 40px rgba(0,0,0,.1), 0 4px 12px rgba(0,0,0,.05);
-      --shadow-brand: 0 8px 28px rgba(232,113,74,.28);
-      --t:            .2s ease;
-      --t-spring:     .3s cubic-bezier(.34,1.56,.64,1);
+      /* Brand */
+      --primary:        #2563EB;
+      --primary-hover:  #1D4ED8;
+      --primary-lt:     #EFF6FF;
+      --primary-border: #BFDBFE;
+      --cta:            #EA580C;
+      --cta-hover:      #C2410C;
+      --cta-lt:         #FFF7ED;
+      --cta-border:     #FED7AA;
+      /* Neutrals */
+      --bg:             #F8FAFC;
+      --bg-2:           #F1F5F9;
+      --card:           #FFFFFF;
+      --border:         #E2E8F0;
+      --border-2:       #CBD5E1;
+      /* Text */
+      --text:           #1E293B;
+      --text-2:         #334155;
+      --muted:          #64748B;
+      /* Semantic */
+      --success:        #059669;
+      --success-lt:     #ECFDF5;
+      --error:          #DC2626;
+      --error-lt:       #FEF2F2;
+      /* Misc */
+      --radius:         10px;
+      --radius-sm:      6px;
+      --radius-lg:      14px;
+      --shadow-sm:      0 1px 2px rgba(0,0,0,.06), 0 1px 3px rgba(0,0,0,.04);
+      --shadow:         0 2px 8px rgba(0,0,0,.07), 0 1px 3px rgba(0,0,0,.04);
+      --shadow-md:      0 4px 16px rgba(0,0,0,.09), 0 2px 6px rgba(0,0,0,.04);
+      --t:              150ms ease;
+      --t-med:          200ms ease;
     }
     [data-theme="dark"] {
-      --bg:           #141210;
-      --bg-2:         #1C1916;
-      --card:         #211E1A;
-      --border:       #322D27;
-      --border-light: #2A2520;
-      --text:         #F2EDE6;
-      --text-2:       #C8BFB5;
-      --muted:        #8A817A;
-      --brand-lt:     #2D1A10;
-      --brand-border: rgba(232,113,74,.15);
-      --success-lt:   #0F2018;
+      --primary-lt:     #1E3A5F;
+      --primary-border: #1E40AF;
+      --cta-lt:         #431407;
+      --cta-border:     #9A3412;
+      --bg:             #0F172A;
+      --bg-2:           #1E293B;
+      --card:           #1E293B;
+      --border:         #334155;
+      --border-2:       #475569;
+      --text:           #F1F5F9;
+      --text-2:         #CBD5E1;
+      --muted:          #94A3B8;
+      --success-lt:     #064E3B;
+      --error-lt:       #450A0A;
     }
 
+    /* ─── BASE ──────────────────────────────────────────────────── */
     html { scroll-behavior: smooth; }
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg); color: var(--text);
       min-height: 100vh;
-      transition: background var(--t), color var(--t);
+      transition: background var(--t-med), color var(--t-med);
       -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+    }
+    /* Reduced motion support (UI/UX Pro Max: reduced-motion rule) */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
     }
 
-    /* ─── BACKGROUND TEXTURE ────────────────────────────────────── */
-    body::before {
-      content: '';
-      position: fixed; inset: 0;
-      background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
-      background-size: 28px 28px;
-      opacity: .45;
-      pointer-events: none;
-      z-index: 0;
-    }
-    header, .hero, .container, footer { position: relative; z-index: 1; }
-
-    /* ─── HEADER ───────────────────────────────────────────────── */
+    /* ─── HEADER ────────────────────────────────────────────────── */
     header {
       position: sticky; top: 0; z-index: 100;
-      background: rgba(255,255,255,.82);
+      background: rgba(255,255,255,.95);
       border-bottom: 1px solid var(--border);
-      padding: 0 28px; height: 62px;
+      padding: 0 24px; height: 60px;
       display: flex; align-items: center; justify-content: space-between;
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
-    [data-theme="dark"] header {
-      background: rgba(33,30,26,.88);
-    }
+    [data-theme="dark"] header { background: rgba(30,41,59,.95); }
+
     .logo {
-      display: flex; align-items: center; gap: 11px;
-      font-weight: 800; font-size: 17px; letter-spacing: -.3px;
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 800; font-size: 17px; letter-spacing: -.4px;
       text-decoration: none; color: var(--text);
     }
     .logo-icon {
-      width: 36px; height: 36px; border-radius: 10px;
-      background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+      width: 34px; height: 34px; border-radius: 8px;
+      background: var(--primary);
       display: flex; align-items: center; justify-content: center;
-      color: #fff; font-size: 17px;
-      box-shadow: 0 3px 10px rgba(232,113,74,.35);
+      flex-shrink: 0;
     }
-    .logo span { color: var(--brand); }
+    .logo-icon svg { width: 18px; height: 18px; color: #fff; }
+    .logo-name { color: var(--text); }
+    .logo-name span { color: var(--primary); }
 
     .header-actions { display: flex; gap: 8px; align-items: center; }
-    .icon-btn {
-      width: 36px; height: 36px; border-radius: 9px;
-      border: 1px solid var(--border);
-      background: var(--card); color: var(--muted); cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 15px; transition: all var(--t);
-    }
-    .icon-btn:hover {
-      background: var(--brand-lt);
-      border-color: var(--brand-border);
-      color: var(--brand);
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-sm);
-    }
 
-    /* ─── HERO ─────────────────────────────────────────────────── */
+    /* Icon button — SVG only, no emojis (UI/UX Pro Max: no-emoji-icons) */
+    .icon-btn {
+      width: 38px; height: 38px; /* ≥44px touch area via padding: touch-target-size */
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--card); color: var(--muted);
+      cursor: pointer; /* cursor-pointer rule */
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--t); padding: 3px;
+    }
+    .icon-btn svg { width: 17px; height: 17px; }
+    .icon-btn:hover { background: var(--bg-2); border-color: var(--border-2); color: var(--text); }
+    .icon-btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; } /* focus-states rule */
+
+    /* ─── HERO ──────────────────────────────────────────────────── */
     .hero {
       text-align: center;
-      padding: 64px 24px 40px;
-      max-width: 700px; margin: 0 auto;
-      position: relative;
+      padding: 64px 24px 44px;
+      max-width: 680px; margin: 0 auto;
     }
-    /* Decorative gradient blobs */
-    .hero::before, .hero::after {
-      content: '';
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(60px);
-      opacity: .12;
-      pointer-events: none;
-    }
-    .hero::before {
-      width: 320px; height: 320px;
-      background: var(--brand);
-      top: -40px; left: -60px;
-    }
-    .hero::after {
-      width: 240px; height: 240px;
-      background: #7B61FF;
-      bottom: 0; right: -40px;
-    }
-
     .badge {
-      display: inline-flex; align-items: center; gap: 7px;
-      background: var(--brand-lt);
-      border: 1px solid var(--brand-border);
-      color: var(--brand);
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--primary-lt);
+      border: 1px solid var(--primary-border);
+      color: var(--primary);
       font-size: 11.5px; font-weight: 700; letter-spacing: .6px;
-      padding: 5px 14px; border-radius: 100px;
-      margin-bottom: 22px; text-transform: uppercase;
+      padding: 5px 12px; border-radius: 100px;
+      margin-bottom: 20px; text-transform: uppercase;
     }
-    .badge-dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--brand);
-      animation: pulse 2s ease-in-out infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: .6; transform: scale(.8); }
-    }
-
+    .badge svg { width: 10px; height: 10px; }
     .hero h1 {
       font-size: clamp(28px, 5vw, 46px);
-      font-weight: 900;
-      line-height: 1.12;
+      font-weight: 800;
+      line-height: 1.1;
       letter-spacing: -1.5px;
       margin-bottom: 16px;
+      color: var(--text);
     }
     .hero h1 em {
       font-style: normal;
-      background: linear-gradient(135deg, var(--brand), var(--brand-dark));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--primary);
     }
     .hero p {
-      font-size: 16.5px; color: var(--muted);
-      line-height: 1.75; margin-bottom: 36px;
-      max-width: 540px; margin-left: auto; margin-right: auto;
-      margin-bottom: 36px;
+      font-size: 16px; color: var(--muted);
+      line-height: 1.75; max-width: 520px;
+      margin: 0 auto 36px;
     }
 
     /* ─── STEP INDICATOR ────────────────────────────────────────── */
     .steps-overview {
       display: flex; justify-content: center; align-items: center;
-      margin-bottom: 44px; gap: 0;
+      margin-bottom: 48px; gap: 0;
     }
     .step-pip {
-      display: flex; flex-direction: column; align-items: center; gap: 8px;
-      font-size: 12px; color: var(--muted); font-weight: 600;
-      letter-spacing: .2px;
+      display: flex; flex-direction: column; align-items: center; gap: 7px;
+      font-size: 12px; font-weight: 600; color: var(--muted);
       transition: color var(--t);
     }
     .step-pip .num {
-      width: 38px; height: 38px; border-radius: 50%;
-      background: var(--card);
-      border: 2px solid var(--border);
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--card); border: 2px solid var(--border);
       color: var(--muted);
       display: flex; align-items: center; justify-content: center;
-      font-size: 14px; font-weight: 700;
-      transition: all var(--t-spring);
-      box-shadow: var(--shadow-sm);
+      font-size: 13px; font-weight: 700;
+      transition: background var(--t), border-color var(--t), color var(--t), box-shadow var(--t);
     }
     .step-pip.active .num {
-      background: linear-gradient(135deg, var(--brand), var(--brand-dark));
-      border-color: transparent;
+      background: var(--primary); border-color: var(--primary);
       color: #fff;
-      box-shadow: 0 4px 14px rgba(232,113,74,.4);
-      transform: scale(1.08);
+      box-shadow: 0 0 0 4px var(--primary-lt);
     }
-    .step-pip.active { color: var(--text); }
+    .step-pip.active { color: var(--text); font-weight: 700; }
     .step-pip.done .num {
-      background: var(--success);
-      border-color: transparent;
-      color: #fff;
+      background: var(--success); border-color: var(--success); color: #fff;
     }
     .step-pip.done { color: var(--success); }
+    /* Check icon inside done step */
+    .step-pip.done .num::after {
+      content: '';
+      display: block; width: 10px; height: 7px;
+      border-left: 2px solid #fff; border-bottom: 2px solid #fff;
+      transform: rotate(-45deg) translate(0px, -1px);
+    }
+    .step-pip.done .num-label { display: none; }
     .step-connector {
-      width: 56px; height: 2px;
-      background: var(--border);
-      margin: 0 2px;
-      margin-bottom: 26px;
-      border-radius: 2px;
-      overflow: hidden;
-      position: relative;
+      width: 48px; height: 2px; background: var(--border);
+      margin: 0 4px; margin-bottom: 22px; border-radius: 2px;
+      transition: background var(--t-med);
     }
-    .step-connector.done {
-      background: var(--success);
-    }
+    .step-connector.done { background: var(--success); }
 
-    /* ─── LAYOUT ───────────────────────────────────────────────── */
+    /* ─── LAYOUT ────────────────────────────────────────────────── */
     .container { max-width: 860px; margin: 0 auto; padding: 0 24px 100px; }
 
-    /* ─── CARD ─────────────────────────────────────────────────── */
+    /* ─── CARD ──────────────────────────────────────────────────── */
     .card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
+      border-radius: var(--radius-lg);
       box-shadow: var(--shadow);
       padding: 32px;
       margin-bottom: 20px;
-      transition: box-shadow var(--t), border-color var(--t);
     }
-    .card:hover { box-shadow: var(--shadow-lg); }
-
     .card-header {
-      display: flex; align-items: flex-start; gap: 16px;
+      display: flex; align-items: flex-start; gap: 14px;
       margin-bottom: 28px;
     }
     .card-icon {
-      width: 46px; height: 46px; border-radius: 12px;
-      background: linear-gradient(135deg, var(--brand-lt), rgba(232,113,74,.08));
-      border: 1px solid var(--brand-border);
-      color: var(--brand);
+      width: 44px; height: 44px; border-radius: var(--radius);
+      background: var(--primary-lt);
+      border: 1px solid var(--primary-border);
       display: flex; align-items: center; justify-content: center;
-      font-size: 22px; flex-shrink: 0;
+      flex-shrink: 0;
     }
+    .card-icon svg { width: 20px; height: 20px; color: var(--primary); }
     .card-title {
-      font-size: 19px; font-weight: 800;
+      font-size: 18px; font-weight: 800;
       letter-spacing: -.4px; margin-bottom: 4px;
+      color: var(--text);
     }
-    .card-sub { font-size: 14px; color: var(--muted); line-height: 1.6; }
+    .card-sub { font-size: 13.5px; color: var(--muted); line-height: 1.6; }
 
-    /* ─── FORM ─────────────────────────────────────────────────── */
-    .field { margin-bottom: 22px; }
+    /* ─── FORM ──────────────────────────────────────────────────── */
+    .field { margin-bottom: 20px; }
     label {
       display: block; font-size: 13.5px;
-      font-weight: 700; margin-bottom: 8px;
+      font-weight: 700; margin-bottom: 7px;
       color: var(--text-2);
     }
     label .tip {
@@ -275,459 +247,403 @@
       margin-top: 3px; line-height: 1.5;
     }
     input[type="text"], textarea, select {
-      width: 100%; padding: 12px 16px;
+      width: 100%; padding: 11px 14px;
       border: 1.5px solid var(--border);
       border-radius: var(--radius-sm);
-      font-size: 14.5px;
-      background: var(--bg);
-      color: var(--text);
-      transition: border-color var(--t), box-shadow var(--t), background var(--t);
+      font-size: 14.5px; font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg); color: var(--text);
+      transition: border-color var(--t), box-shadow var(--t);
       outline: none;
-      font-family: 'Inter', sans-serif;
+      cursor: text;
     }
     input[type="text"]:focus, textarea:focus, select:focus {
-      border-color: var(--brand);
-      box-shadow: 0 0 0 3.5px rgba(232,113,74,.12);
-      background: var(--card);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-lt);
     }
-    input[type="text"]::placeholder, textarea::placeholder {
-      color: var(--muted); opacity: .7;
+    /* Focus visible for keyboard nav (focus-states rule) */
+    input[type="text"]:focus-visible, textarea:focus-visible, select:focus-visible {
+      outline: 2px solid var(--primary); outline-offset: 0;
     }
+    input[type="text"]::placeholder, textarea::placeholder { color: var(--muted); opacity: .65; }
     textarea { resize: vertical; min-height: 130px; line-height: 1.65; }
-    select { cursor: pointer; appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237A7370' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-      background-repeat: no-repeat; background-position: right 14px center;
-      padding-right: 40px;
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' viewBox='0 0 24 24' stroke='%2364748B' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center;
+      padding-right: 38px;
     }
     .char-count {
-      font-size: 12px; text-align: right;
-      margin-top: 6px; color: var(--muted);
-      font-variant-numeric: tabular-nums;
+      font-size: 12px; text-align: right; margin-top: 5px;
+      color: var(--muted); font-variant-numeric: tabular-nums;
     }
-    .char-count.warn { color: var(--brand); font-weight: 600; }
+    .char-count.warn { color: var(--cta); font-weight: 600; }
 
-    /* ─── BUTTONS ──────────────────────────────────────────────── */
+    /* ─── BUTTONS ───────────────────────────────────────────────── */
     .btn {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 11px 22px; border-radius: var(--radius-sm);
-      font-size: 14.5px; font-weight: 700; cursor: pointer;
-      border: none; transition: all var(--t);
-      font-family: 'Inter', sans-serif;
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      font-size: 14px; font-weight: 700;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer; border: none;
+      transition: all var(--t);
+      min-height: 44px; /* touch-target-size rule */
+      white-space: nowrap;
       letter-spacing: -.1px;
     }
+    .btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+    .btn:disabled { opacity: .55; cursor: not-allowed; pointer-events: none; }
+
     .btn-primary {
-      background: linear-gradient(135deg, var(--brand), var(--brand-dark));
-      color: #fff;
-      box-shadow: 0 2px 8px rgba(232,113,74,.3);
+      background: var(--primary); color: #fff;
+      box-shadow: 0 1px 3px rgba(37,99,235,.3);
     }
-    .btn-primary:hover {
-      background: linear-gradient(135deg, var(--brand-light), var(--brand));
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-brand);
+    .btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
+    .btn-primary:active:not(:disabled) { transform: scale(.98); }
+
+    .btn-cta {
+      background: var(--cta); color: #fff;
+      box-shadow: 0 1px 3px rgba(234,88,12,.3);
     }
-    .btn-primary:active { transform: translateY(0); }
+    .btn-cta:hover:not(:disabled) { background: var(--cta-hover); }
+    .btn-cta:active:not(:disabled) { transform: scale(.98); }
 
     .btn-secondary {
-      background: var(--card);
-      color: var(--text-2);
+      background: var(--card); color: var(--text-2);
       border: 1.5px solid var(--border);
       box-shadow: var(--shadow-sm);
     }
-    .btn-secondary:hover {
-      background: var(--brand-lt);
-      border-color: var(--brand-border);
-      color: var(--brand);
-      transform: translateY(-1px);
-      box-shadow: var(--shadow);
-    }
+    .btn-secondary:hover:not(:disabled) { background: var(--bg-2); border-color: var(--border-2); }
+
     .btn-ghost {
-      background: transparent;
-      color: var(--muted);
-      padding: 8px 12px;
-      font-size: 13.5px;
-      font-weight: 600;
+      background: transparent; color: var(--muted);
+      padding: 10px 14px; font-size: 13.5px;
     }
-    .btn-ghost:hover { color: var(--brand); }
+    .btn-ghost:hover:not(:disabled) { color: var(--primary); background: var(--primary-lt); border-radius: var(--radius-sm); }
+
     .btn-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .btn svg { width: 15px; height: 15px; flex-shrink: 0; }
 
-    /* ─── TEMPLATES ────────────────────────────────────────────── */
-    .template-label {
-      font-size: 12px; font-weight: 700; letter-spacing: .5px;
+    /* Loading spinner inside button (loading-buttons rule) */
+    .btn-loading { position: relative; }
+    .btn-spinner {
+      width: 14px; height: 14px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,.35);
+      border-top-color: #fff;
+      animation: spin .65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── TEMPLATE CHIPS ────────────────────────────────────────── */
+    .template-section-label {
+      font-size: 11.5px; font-weight: 700; letter-spacing: .6px;
       text-transform: uppercase; color: var(--muted);
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
-    .template-row {
-      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px;
-    }
+    .template-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
     .chip {
-      padding: 7px 16px; border-radius: 100px;
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 14px; border-radius: 100px;
       font-size: 13px; font-weight: 600;
-      background: var(--bg-2);
-      border: 1.5px solid var(--border);
-      color: var(--muted);
+      background: var(--bg-2); border: 1.5px solid var(--border); color: var(--muted);
       cursor: pointer;
-      transition: all var(--t-spring);
-      white-space: nowrap;
+      transition: all var(--t);
+      min-height: 36px;
     }
-    .chip:hover {
-      background: var(--brand-lt);
-      border-color: var(--brand-border);
-      color: var(--brand);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(232,113,74,.15);
-    }
-    .chip.active {
-      background: linear-gradient(135deg, var(--brand), var(--brand-dark));
-      border-color: transparent;
-      color: #fff;
-      box-shadow: 0 4px 12px rgba(232,113,74,.3);
-    }
+    .chip svg { width: 13px; height: 13px; }
+    .chip:hover { background: var(--primary-lt); border-color: var(--primary-border); color: var(--primary); }
+    .chip:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+    .chip.active { background: var(--primary); border-color: var(--primary); color: #fff; }
 
-    /* ─── PROGRESS ─────────────────────────────────────────────── */
+    /* ─── PROGRESS BAR ──────────────────────────────────────────── */
     .progress-bar {
-      height: 4px; background: var(--border);
-      border-radius: 2px; margin-bottom: 6px;
-      overflow: hidden;
+      height: 4px; background: var(--border); border-radius: 2px;
+      margin-bottom: 6px; overflow: hidden;
     }
     .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--brand), var(--brand-light));
-      border-radius: 2px;
-      transition: width .45s cubic-bezier(.4,0,.2,1);
+      height: 100%; background: var(--primary); border-radius: 2px;
+      transition: width 300ms ease;
     }
     .progress-label {
-      font-size: 12.5px; color: var(--muted);
-      margin-bottom: 28px;
-      font-weight: 500;
+      font-size: 12.5px; color: var(--muted); margin-bottom: 24px; font-weight: 500;
     }
 
-    /* ─── ANALYZING STATE ────────────────────────────────────────── */
+    /* ─── ANALYZING STATE ───────────────────────────────────────── */
     .analyzing-state {
       display: flex; flex-direction: column; align-items: center;
-      padding: 56px 0; gap: 18px; text-align: center;
+      padding: 56px 0; gap: 16px; text-align: center;
     }
-    .spinner-wrap {
+    .analyzing-icon-wrap {
       width: 52px; height: 52px; border-radius: 50%;
-      background: var(--brand-lt);
-      border: 1px solid var(--brand-border);
+      background: var(--primary-lt); border: 1px solid var(--primary-border);
       display: flex; align-items: center; justify-content: center;
     }
     .spinner {
-      width: 30px; height: 30px; border-radius: 50%;
-      border: 2.5px solid var(--border);
-      border-top-color: var(--brand);
+      width: 24px; height: 24px; border-radius: 50%;
+      border: 2.5px solid var(--primary-border);
+      border-top-color: var(--primary);
       animation: spin .7s linear infinite;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .analyzing-state h3 {
-      font-size: 17px; font-weight: 800; letter-spacing: -.3px;
-    }
-    .analyzing-state p {
-      font-size: 14px; color: var(--muted);
-      max-width: 360px; line-height: 1.6;
-    }
+    .analyzing-state h3 { font-size: 16px; font-weight: 800; letter-spacing: -.3px; }
+    .analyzing-state p { font-size: 13.5px; color: var(--muted); max-width: 340px; line-height: 1.6; }
 
-    /* ─── Q META BAR ─────────────────────────────────────────────── */
+    /* ─── Q META BAR ────────────────────────────────────────────── */
     .q-meta-bar {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 18px;
-      background: linear-gradient(135deg, var(--brand-lt), rgba(232,113,74,.04));
-      border: 1px solid var(--brand-border);
-      border-radius: var(--radius-sm);
-      margin-bottom: 28px;
-      font-size: 13px;
+      padding: 11px 16px;
+      background: var(--primary-lt); border: 1px solid var(--primary-border);
+      border-radius: var(--radius-sm); margin-bottom: 24px; font-size: 13px;
     }
-    .q-meta-bar strong { color: var(--brand); font-weight: 800; }
-    .q-meta-bar span { color: var(--muted); font-weight: 500; }
+    .q-meta-bar strong { color: var(--primary); font-weight: 800; }
     .q-meta-tag {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 100px;
-      padding: 3px 12px;
-      font-size: 12.5px;
-      font-weight: 600;
-      color: var(--text-2);
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 100px; padding: 3px 11px;
+      font-size: 12px; font-weight: 600; color: var(--text-2);
     }
 
     /* ─── DYNAMIC QUESTIONS ─────────────────────────────────────── */
     .dyn-q {
-      display: flex; gap: 18px; align-items: flex-start;
-      padding: 22px 0;
-      border-bottom: 1px solid var(--border-light);
-      opacity: 0;
-      animation: fadeUp .4s ease forwards;
+      display: flex; gap: 16px; align-items: flex-start;
+      padding: 20px 0; border-bottom: 1px solid var(--border);
+      opacity: 0; animation: fadeUp .35s ease forwards;
     }
     .dyn-q:last-child { border-bottom: none; }
-    .dyn-q:nth-child(1)  { animation-delay: .05s; }
-    .dyn-q:nth-child(2)  { animation-delay: .12s; }
-    .dyn-q:nth-child(3)  { animation-delay: .19s; }
-    .dyn-q:nth-child(4)  { animation-delay: .26s; }
-    .dyn-q:nth-child(5)  { animation-delay: .33s; }
-    .dyn-q:nth-child(6)  { animation-delay: .40s; }
-    .dyn-q:nth-child(7)  { animation-delay: .47s; }
-    .dyn-q:nth-child(8)  { animation-delay: .54s; }
+    .dyn-q:nth-child(1) { animation-delay: .04s; }
+    .dyn-q:nth-child(2) { animation-delay: .1s; }
+    .dyn-q:nth-child(3) { animation-delay: .16s; }
+    .dyn-q:nth-child(4) { animation-delay: .22s; }
+    .dyn-q:nth-child(5) { animation-delay: .28s; }
+    .dyn-q:nth-child(6) { animation-delay: .34s; }
+    .dyn-q:nth-child(7) { animation-delay: .40s; }
+    .dyn-q:nth-child(8) { animation-delay: .46s; }
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(12px); }
+      from { opacity: 0; transform: translateY(10px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
     .dyn-q-num {
-      width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
-      background: linear-gradient(135deg, var(--brand), var(--brand-dark));
-      color: #fff;
+      width: 30px; height: 30px; border-radius: 50%;
+      background: var(--primary); color: #fff;
       display: flex; align-items: center; justify-content: center;
-      font-size: 13px; font-weight: 800; margin-top: 2px;
-      box-shadow: 0 2px 8px rgba(232,113,74,.3);
+      font-size: 12px; font-weight: 800; flex-shrink: 0; margin-top: 3px;
     }
     .dyn-q-body { flex: 1; }
     .dyn-q-label {
-      display: flex; align-items: center; gap: 9px;
-      font-size: 15px; font-weight: 800;
-      margin-bottom: 5px; letter-spacing: -.2px;
+      display: flex; align-items: center; gap: 8px;
+      font-size: 15px; font-weight: 800; margin-bottom: 4px;
+      letter-spacing: -.2px;
     }
-    .dyn-q-label .icon { font-size: 17px; }
-    .dyn-q-hint {
-      font-size: 13px; color: var(--muted);
-      line-height: 1.6; margin-bottom: 12px;
-    }
+    .dyn-q-label svg { width: 16px; height: 16px; color: var(--primary); flex-shrink: 0; }
+    .dyn-q-hint { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 10px; }
 
-    /* toggle question */
+    /* Toggle question */
     .toggle-row {
-      display: flex; align-items: center; gap: 12px; cursor: pointer;
-      padding: 12px 16px;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      background: var(--bg);
-      transition: all var(--t);
+      display: flex; align-items: center; gap: 10px; cursor: pointer;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--bg); color: var(--text-2);
       font-size: 14px; font-weight: 600;
-      color: var(--text-2);
+      transition: all var(--t);
     }
-    .toggle-row:hover {
-      border-color: var(--brand-border);
-      background: var(--brand-lt);
-      color: var(--brand);
-    }
-    .toggle-row.checked {
-      border-color: var(--brand);
-      background: var(--brand-lt);
-      color: var(--brand-dark);
-    }
-    .toggle-row input[type="checkbox"] {
-      width: 17px; height: 17px;
-      accent-color: var(--brand); cursor: pointer; flex-shrink: 0;
-    }
-    .toggle-detail { margin-top: 12px; }
+    .toggle-row:hover { border-color: var(--primary-border); background: var(--primary-lt); color: var(--primary); }
+    .toggle-row.checked { border-color: var(--primary); background: var(--primary-lt); color: var(--primary); }
+    .toggle-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; flex-shrink: 0; }
+    .toggle-detail { margin-top: 10px; }
 
-    /* ─── OUTPUT ───────────────────────────────────────────────── */
+    /* ─── OUTPUT ────────────────────────────────────────────────── */
     .output-wrapper {
-      position: relative;
-      background: var(--bg);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      overflow: hidden;
+      border: 1.5px solid var(--border); border-radius: var(--radius);
+      overflow: hidden; background: var(--bg);
     }
-    .output-header {
+    .output-bar {
       display: flex; align-items: center; justify-content: space-between;
       padding: 10px 16px;
-      background: var(--bg-2);
-      border-bottom: 1px solid var(--border);
+      background: var(--bg-2); border-bottom: 1px solid var(--border);
     }
-    .output-dots { display: flex; gap: 6px; }
-    .output-dots span {
-      width: 11px; height: 11px; border-radius: 50%;
-    }
-    .output-dots span:nth-child(1) { background: #FF5F57; }
-    .output-dots span:nth-child(2) { background: #FFBD2E; }
-    .output-dots span:nth-child(3) { background: #28C840; }
+    .output-bar-left { display: flex; align-items: center; gap: 8px; }
+    .traffic-dots { display: flex; gap: 5px; }
+    .traffic-dots span { width: 11px; height: 11px; border-radius: 50%; }
+    .traffic-dots span:nth-child(1) { background: #FF5F57; }
+    .traffic-dots span:nth-child(2) { background: #FFBD2E; }
+    .traffic-dots span:nth-child(3) { background: #28C840; }
     .output-filename {
-      font-size: 12px; font-weight: 600;
-      color: var(--muted);
       font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px; color: var(--muted); font-weight: 500;
     }
-
     .prompt-output {
-      padding: 22px 24px;
-      font-family: 'JetBrains Mono', 'Menlo', 'Consolas', monospace;
-      font-size: 12.5px; line-height: 1.85;
+      padding: 20px 22px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px; line-height: 1.8;
       white-space: pre-wrap; word-break: break-word;
-      color: var(--text);
-      max-height: 520px; overflow-y: auto;
+      color: var(--text); max-height: 480px; overflow-y: auto;
     }
-    .prompt-output::-webkit-scrollbar { width: 6px; }
+    .prompt-output::-webkit-scrollbar { width: 5px; }
     .prompt-output::-webkit-scrollbar-track { background: transparent; }
-    .prompt-output::-webkit-scrollbar-thumb {
-      background: var(--border);
-      border-radius: 3px;
-    }
+    .prompt-output::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
     .prompt-meta {
-      display: flex; gap: 10px; flex-wrap: wrap;
-      font-size: 12px; color: var(--muted);
-      margin-bottom: 16px; align-items: center;
+      display: flex; gap: 8px; flex-wrap: wrap;
+      font-size: 12px; color: var(--muted); margin-bottom: 16px;
     }
     .prompt-meta span {
-      display: flex; align-items: center; gap: 5px;
-      background: var(--bg-2);
-      border: 1px solid var(--border);
-      border-radius: 100px;
-      padding: 3px 10px;
-      font-weight: 500;
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--bg-2); border: 1px solid var(--border);
+      border-radius: 100px; padding: 3px 10px; font-weight: 500;
     }
-
     .output-toolbar {
       display: flex; gap: 8px; justify-content: flex-end;
-      margin-top: 18px; flex-wrap: wrap;
+      margin-top: 16px; flex-wrap: wrap;
     }
     .copy-success { color: var(--success) !important; }
 
-    /* ─── TIPS ─────────────────────────────────────────────────── */
+    /* ─── TIPS PANEL ────────────────────────────────────────────── */
     .tips {
-      background: linear-gradient(135deg, var(--brand-lt), rgba(232,113,74,.04));
-      border: 1px solid var(--brand-border);
-      border-radius: var(--radius);
-      padding: 22px 26px; margin-bottom: 20px;
+      background: var(--primary-lt);
+      border: 1px solid var(--primary-border);
+      border-radius: var(--radius-lg); padding: 20px 24px; margin-bottom: 20px;
     }
-    .tips-header {
-      display: flex; align-items: center; gap: 10px;
-      margin-bottom: 14px;
-    }
-    .tips h3 {
-      font-size: 13.5px; font-weight: 800;
-      color: var(--brand); letter-spacing: -.1px;
-    }
-    .tips ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .tips-header { display: flex; align-items: center; gap: 9px; margin-bottom: 12px; }
+    .tips-header svg { width: 17px; height: 17px; color: var(--primary); }
+    .tips h3 { font-size: 13px; font-weight: 800; color: var(--primary); letter-spacing: -.1px; }
+    .tips ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
     .tips li {
       font-size: 13px; color: var(--muted);
-      display: flex; gap: 10px; line-height: 1.6;
-      align-items: flex-start;
+      display: flex; gap: 9px; line-height: 1.6; align-items: flex-start;
     }
-    .tips li::before {
-      content: "→";
-      color: var(--brand); flex-shrink: 0;
-      font-weight: 800; margin-top: 1px;
+    .tips li::before { content: "→"; color: var(--primary); font-weight: 800; flex-shrink: 0; }
+    code.inline {
+      background: var(--bg-2); padding: 1px 6px;
+      border-radius: 4px; font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px; color: var(--primary);
     }
 
-    /* ─── HOW TO USE CARDS ──────────────────────────────────────── */
+    /* ─── HOW-TO GRID ───────────────────────────────────────────── */
     .how-to-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 14px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 12px;
     }
     .how-to-card {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 18px 20px;
-      transition: all var(--t);
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 16px 18px;
+      transition: border-color var(--t), background var(--t);
     }
-    .how-to-card:hover {
-      border-color: var(--brand-border);
-      background: var(--brand-lt);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow);
-    }
-    .how-to-num {
-      font-size: 26px; margin-bottom: 10px;
-    }
-    .how-to-title {
-      font-size: 13.5px; font-weight: 800;
-      margin-bottom: 5px; letter-spacing: -.2px;
-    }
-    .how-to-desc {
-      font-size: 12.5px; color: var(--muted); line-height: 1.6;
-    }
-    .how-to-desc code {
-      background: var(--border);
-      padding: 1px 6px;
-      border-radius: 4px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11.5px;
-    }
+    .how-to-card:hover { border-color: var(--primary-border); background: var(--primary-lt); }
+    .how-to-icon { margin-bottom: 9px; }
+    .how-to-icon svg { width: 22px; height: 22px; color: var(--primary); }
+    .how-to-title { font-size: 13px; font-weight: 800; margin-bottom: 4px; letter-spacing: -.2px; }
+    .how-to-desc { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
 
-    /* ─── MISC ─────────────────────────────────────────────────── */
-    .hidden { display: none !important; }
-    .divider {
-      border: none; border-top: 1px solid var(--border);
-      margin: 30px 0;
-    }
-    .section-heading {
-      font-size: 15px; font-weight: 800;
-      letter-spacing: -.3px; margin-bottom: 16px;
-    }
+    /* ─── SECTION HEADING ───────────────────────────────────────── */
+    .section-heading { font-size: 14.5px; font-weight: 800; letter-spacing: -.3px; margin-bottom: 14px; }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 26px 0; }
 
-    /* ─── TOAST ─────────────────────────────────────────────────── */
+    /* ─── TOAST (aria-live region) ──────────────────────────────── */
     .toast {
-      position: fixed; bottom: 28px; right: 28px; z-index: 999;
+      position: fixed; bottom: 24px; right: 24px; z-index: 999;
       background: var(--text); color: var(--bg);
-      padding: 13px 22px; border-radius: var(--radius-sm);
-      font-size: 14px; font-weight: 600;
-      box-shadow: 0 8px 30px rgba(0,0,0,.25);
-      transform: translateY(90px) scale(.96); opacity: 0;
-      transition: all .35s cubic-bezier(.34,1.3,.64,1);
+      padding: 12px 18px; border-radius: var(--radius-sm);
+      font-size: 13.5px; font-weight: 600;
+      box-shadow: var(--shadow-md);
+      transform: translateY(80px); opacity: 0;
+      transition: transform .3s ease, opacity .3s ease;
       pointer-events: none;
-      display: flex; align-items: center; gap: 9px;
+      display: flex; align-items: center; gap: 8px;
     }
-    .toast.show { transform: translateY(0) scale(1); opacity: 1; }
-    .toast-icon { font-size: 16px; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast svg { width: 15px; height: 15px; color: var(--success); flex-shrink: 0; }
+
+    /* Error alert (aria-live rule) */
+    .field-error {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12.5px; color: var(--error); margin-top: 5px; font-weight: 600;
+    }
+    .field-error svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+    /* ─── HIDDEN ────────────────────────────────────────────────── */
+    .hidden { display: none !important; }
 
     /* ─── FOOTER ────────────────────────────────────────────────── */
     footer {
-      text-align: center; font-size: 13px;
-      color: var(--muted); padding: 24px;
-      border-top: 1px solid var(--border);
-      background: var(--card);
-      font-weight: 500;
+      text-align: center; font-size: 13px; color: var(--muted);
+      padding: 22px 24px; border-top: 1px solid var(--border);
+      background: var(--card); font-weight: 500;
     }
-    footer a { color: var(--brand); text-decoration: none; }
-    footer a:hover { text-decoration: underline; }
 
     /* ─── RESPONSIVE ────────────────────────────────────────────── */
-    @media (max-width: 600px) {
-      .card { padding: 22px 20px; }
-      .hero { padding: 40px 20px 28px; }
+    @media (max-width: 768px) {
+      .hero { padding: 44px 20px 32px; }
+      .card { padding: 22px 18px; }
       .step-connector { width: 28px; }
       .hero h1 { letter-spacing: -.8px; }
+    }
+    @media (max-width: 480px) {
       .btn-row { flex-direction: column; align-items: stretch; }
       .btn-row .btn { justify-content: center; }
-      .output-toolbar { justify-content: stretch; }
-      .output-toolbar .btn { flex: 1; justify-content: center; }
+      .output-toolbar { flex-wrap: wrap; }
+      .output-toolbar .btn { flex: 1 1 calc(50% - 4px); justify-content: center; }
     }
   </style>
 </head>
 <body>
 
+<!-- ─── TOAST (aria-live for screen readers) ─────────────────── -->
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="toastMsg"></span>
+</div>
+
+<!-- ─── ERROR REGION ─────────────────────────────────────────── -->
+<div id="errorRegion" role="alert" aria-live="assertive" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;"></div>
+
 <header>
-  <a class="logo" href="#">
-    <div class="logo-icon">✦</div>
-    Prompt <span>Architect</span>
+  <a class="logo" href="#" aria-label="Prompt Architect home">
+    <div class="logo-icon" aria-hidden="true">
+      <!-- Sparkle / star icon -->
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>
+      </svg>
+    </div>
+    <span class="logo-name">Prompt <span>Architect</span></span>
   </a>
   <div class="header-actions">
-    <button class="icon-btn" id="themeToggle" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
-    <button class="icon-btn" onclick="resetAll()" title="Start over" aria-label="Start over">↺</button>
+    <button class="icon-btn" id="themeToggle" aria-label="Toggle dark mode">
+      <!-- Moon icon -->
+      <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
+    <button class="icon-btn" onclick="resetAll()" aria-label="Start over — reset all inputs">
+      <!-- Refresh icon -->
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/>
+      </svg>
+    </button>
   </div>
 </header>
 
-<div class="toast" id="toast"><span class="toast-icon">✓</span><span id="toastMsg"></span></div>
-
-<!-- HERO -->
+<!-- ─── HERO ──────────────────────────────────────────────────── -->
 <div class="hero">
-  <div class="badge"><div class="badge-dot"></div> Smart Question Engine</div>
+  <div class="badge" aria-label="Feature: Smart Question Engine">
+    <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg>
+    Smart Question Engine
+  </div>
   <h1>Turn any rough idea into a<br><em>production-ready prompt</em></h1>
   <p>Describe what you want your AI to do — we'll figure out exactly which questions matter and generate a perfectly structured, Claude-optimized prompt.</p>
 
-  <div class="steps-overview">
-    <div class="step-pip active" id="pip1">
-      <div class="num">1</div>
+  <div class="steps-overview" role="list" aria-label="Progress steps">
+    <div class="step-pip active" id="pip1" role="listitem" aria-current="step">
+      <div class="num" aria-hidden="true"><span class="num-label">1</span></div>
       <span>Your Idea</span>
     </div>
-    <div class="step-connector" id="conn1"></div>
-    <div class="step-pip" id="pip2">
-      <div class="num">2</div>
+    <div class="step-connector" id="conn1" aria-hidden="true"></div>
+    <div class="step-pip" id="pip2" role="listitem">
+      <div class="num" aria-hidden="true"><span class="num-label">2</span></div>
       <span>Questions</span>
     </div>
-    <div class="step-connector" id="conn2"></div>
-    <div class="step-pip" id="pip3">
-      <div class="num">3</div>
+    <div class="step-connector" id="conn2" aria-hidden="true"></div>
+    <div class="step-pip" id="pip3" role="listitem">
+      <div class="num" aria-hidden="true"><span class="num-label">3</span></div>
       <span>Your Prompt</span>
     </div>
   </div>
@@ -735,59 +651,97 @@
 
 <div class="container">
 
-  <!-- TIPS -->
-  <div class="tips" id="tipsPanel">
+  <!-- TIPS PANEL -->
+  <div class="tips" id="tipsPanel" role="note">
     <div class="tips-header">
-      <span style="font-size:18px;">💡</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
       <h3>Why structured prompts matter</h3>
     </div>
     <ul>
       <li>Clearer context = fewer back-and-forth messages — fewer tokens, lower cost.</li>
-      <li>Only the questions <em>relevant to your task</em> are shown — no noise.</li>
-      <li><code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--brand-lt);padding:1px 5px;border-radius:3px;color:var(--brand);">{{PLACEHOLDERS}}</code> make your prompt reusable across any input.</li>
-      <li>Chain-of-thought instructions ("think step by step") reduce reasoning errors.</li>
+      <li>Only the questions <strong>relevant to your task</strong> are shown — no noise.</li>
+      <li><code class="inline">{{PLACEHOLDERS}}</code> make your prompt reusable across any input.</li>
+      <li>Chain-of-thought instructions reduce reasoning errors significantly.</li>
     </ul>
   </div>
 
   <!-- ── STEP 1 ── -->
-  <div class="card" id="step1Card">
+  <div class="card" id="step1Card" role="main">
     <div class="card-header">
-      <div class="card-icon">💡</div>
+      <div class="card-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>
+        </svg>
+      </div>
       <div>
         <div class="card-title">Step 1 — Describe your idea</div>
         <div class="card-sub">Tell us what you want your AI to do. The more detail, the smarter the questions.</div>
       </div>
     </div>
 
-    <div class="template-label">Quick-start templates</div>
-    <div class="template-row">
-      <div class="chip" onclick="loadTemplate('career',event)">🎯 Career Coach</div>
-      <div class="chip" onclick="loadTemplate('support',event)">💬 Customer Support</div>
-      <div class="chip" onclick="loadTemplate('writer',event)">✍️ Content Writer</div>
-      <div class="chip" onclick="loadTemplate('tutor',event)">📚 Study Tutor</div>
-      <div class="chip" onclick="loadTemplate('sales',event)">📈 Sales Assistant</div>
-      <div class="chip" onclick="loadTemplate('code',event)">💻 Code Reviewer</div>
+    <div class="template-section-label" id="templates-label">Quick-start templates</div>
+    <div class="template-row" role="group" aria-labelledby="templates-label">
+      <button class="chip" onclick="loadTemplate('career',event)" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+        Career Coach
+      </button>
+      <button class="chip" onclick="loadTemplate('support',event)" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Customer Support
+      </button>
+      <button class="chip" onclick="loadTemplate('writer',event)" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        Content Writer
+      </button>
+      <button class="chip" onclick="loadTemplate('tutor',event)" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        Study Tutor
+      </button>
+      <button class="chip" onclick="loadTemplate('sales',event)" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+        Sales Assistant
+      </button>
+      <button class="chip" onclick="loadTemplate('code',event)" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        Code Reviewer
+      </button>
     </div>
 
     <div class="field">
-      <label>What should your AI do?
-        <span class="tip">Be as specific as possible — describe the task, the users, the context, and any special requirements.</span>
+      <label for="ideaInput">
+        What should your AI do?
+        <span class="tip">Be specific — describe the task, users, context, and any special requirements.</span>
       </label>
-      <textarea id="ideaInput" placeholder="Example: I want an AI that helps our customer support team handle billing questions and refund requests for a subscription SaaS product. It should follow our refund policy and escalate complex cases to human agents..." oninput="onIdeaInput()" style="min-height:150px;"></textarea>
-      <div class="char-count" id="ideaCount">0 / 5000</div>
+      <textarea
+        id="ideaInput"
+        placeholder="Example: I want an AI that helps our customer support team handle billing questions and refund requests for a subscription SaaS product. It should follow our refund policy and escalate complex cases to human agents..."
+        oninput="onIdeaInput()"
+        style="min-height:150px;"
+        aria-required="true"
+        aria-describedby="ideaCount"
+      ></textarea>
+      <div class="char-count" id="ideaCount" aria-live="polite">0 / 5000</div>
     </div>
 
     <div class="btn-row">
-      <button class="btn btn-primary" onclick="goToStep2()" id="step1Btn">
-        <span>✦</span> Analyse &amp; Get Questions
+      <button class="btn btn-cta" onclick="goToStep2()" id="step1Btn" type="button" aria-describedby="step1HelpText">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Analyse &amp; Get Questions
       </button>
+      <span id="step1HelpText" style="display:none">Analyses your idea and generates relevant questions</span>
     </div>
   </div>
 
   <!-- ── STEP 2 ── -->
   <div class="card hidden" id="step2Card">
     <div class="card-header">
-      <div class="card-icon">❓</div>
+      <div class="card-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </div>
       <div>
         <div class="card-title" id="step2Title">Questions for your prompt</div>
         <div class="card-sub" id="step2Sub">Based on your idea, here are the questions that will shape your prompt.</div>
@@ -795,27 +749,37 @@
     </div>
 
     <!-- Analyzing state -->
-    <div class="analyzing-state" id="analyzingState">
-      <div class="spinner-wrap">
+    <div class="analyzing-state" id="analyzingState" role="status" aria-live="polite" aria-label="Analysing your idea, please wait">
+      <div class="analyzing-icon-wrap" aria-hidden="true">
         <div class="spinner"></div>
       </div>
       <h3>Analysing your idea…</h3>
       <p>Figuring out which questions will actually improve your prompt.</p>
     </div>
 
-    <!-- Questions container -->
     <div class="hidden" id="questionsWrap">
-      <div class="q-meta-bar" id="qMetaBar">
+      <div class="q-meta-bar">
         <span><strong id="qCount">0</strong> targeted questions</span>
         <span class="q-meta-tag" id="qContextTag"></span>
       </div>
-      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+      <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBarEl">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
       <div class="progress-label" id="progressLabel">Fill in what you know — skip anything that doesn't apply.</div>
+
       <div id="dynamicQuestions"></div>
+
       <hr class="divider" />
       <div class="btn-row">
-        <button class="btn btn-primary" onclick="generatePrompt()">✦ Generate My Prompt</button>
-        <button class="btn btn-secondary" onclick="showStep(1)">← Back</button>
+        <button class="btn btn-cta" onclick="generatePrompt()" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          Generate My Prompt
+        </button>
+        <button class="btn btn-secondary" onclick="showStep(1)" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+          Back
+        </button>
       </div>
     </div>
   </div>
@@ -823,51 +787,72 @@
   <!-- ── STEP 3 ── -->
   <div class="card hidden" id="step3Card">
     <div class="card-header">
-      <div class="card-icon">✦</div>
+      <div class="card-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
       <div>
         <div class="card-title">Your Structured Prompt</div>
         <div class="card-sub">Copy and paste directly into Claude's system prompt field.</div>
       </div>
     </div>
 
-    <div class="prompt-meta" id="promptMeta"></div>
+    <div class="prompt-meta" id="promptMeta" aria-label="Prompt metadata"></div>
 
-    <div class="output-wrapper">
-      <div class="output-header">
-        <div class="output-dots">
-          <span></span><span></span><span></span>
+    <div class="output-wrapper" role="region" aria-label="Generated prompt output">
+      <div class="output-bar">
+        <div class="output-bar-left">
+          <div class="traffic-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+          <span class="output-filename">system_prompt.txt</span>
         </div>
-        <span class="output-filename">system_prompt.txt</span>
-        <span style="font-size:12px;color:var(--muted);font-weight:500;">Generated by Prompt Architect</span>
+        <span style="font-size:11.5px;color:var(--muted);font-weight:500;">Prompt Architect v2</span>
       </div>
-      <div class="prompt-output" id="promptOutput"></div>
+      <pre class="prompt-output" id="promptOutput" tabindex="0" aria-label="Generated prompt text, use copy button to copy"></pre>
     </div>
 
     <div class="output-toolbar">
-      <button class="btn btn-secondary" id="copyBtn" onclick="copyPrompt()">📋 Copy Prompt</button>
-      <button class="btn btn-secondary" onclick="downloadPrompt()">⬇ Download .txt</button>
-      <button class="btn btn-ghost" onclick="showStep(2)">← Edit Answers</button>
-      <button class="btn btn-primary" onclick="resetAll()">+ New Prompt</button>
+      <button class="btn btn-primary" id="copyBtn" onclick="copyPrompt()" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy Prompt
+      </button>
+      <button class="btn btn-secondary" onclick="downloadPrompt()" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download .txt
+      </button>
+      <button class="btn btn-ghost" onclick="showStep(2)" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+        Edit Answers
+      </button>
+      <button class="btn btn-secondary" onclick="resetAll()" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Prompt
+      </button>
     </div>
 
     <hr class="divider" />
-
     <div class="section-heading">How to use this prompt</div>
     <div class="how-to-grid">
       <div class="how-to-card">
-        <div class="how-to-num">1️⃣</div>
+        <div class="how-to-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/></svg>
+        </div>
         <div class="how-to-title">In Claude.ai</div>
         <div class="how-to-desc">Open a new Project → paste into the System Prompt field.</div>
       </div>
       <div class="how-to-card">
-        <div class="how-to-num">2️⃣</div>
+        <div class="how-to-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
         <div class="how-to-title">Via API</div>
-        <div class="how-to-desc">Use as the <code>system</code> parameter in your API call.</div>
+        <div class="how-to-desc">Use as the <code class="inline">system</code> parameter in your API call.</div>
       </div>
       <div class="how-to-card">
-        <div class="how-to-num">3️⃣</div>
+        <div class="how-to-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </div>
         <div class="how-to-title">Fill Placeholders</div>
-        <div class="how-to-desc">Replace <code>{{DOCUMENT}}</code>, <code>{{HISTORY}}</code>, <code>{{QUESTION}}</code> at runtime.</div>
+        <div class="how-to-desc">Replace <code class="inline">{{DOCUMENT}}</code>, <code class="inline">{{HISTORY}}</code>, <code class="inline">{{QUESTION}}</code> at runtime.</div>
       </div>
     </div>
   </div>
@@ -875,7 +860,7 @@
 </div><!-- /container -->
 
 <footer>
-  Prompt Architect &nbsp;·&nbsp; Optimized for Claude &nbsp;·&nbsp; v2.1
+  Prompt Architect &nbsp;·&nbsp; Optimized for Claude &nbsp;·&nbsp; v2.2
 </footer>
 
 <script>
@@ -883,127 +868,118 @@
    QUESTION POOL
 ═══════════════════════════════════════════════════════════════ */
 const Q_POOL = [
-  {
-    id: 'persona', icon: '🎭', label: 'AI Persona & Role',
-    question: 'What persona or role should this AI take on?',
-    hint: 'A named character with a company and job title makes responses far more consistent and on-brand.',
-    type: 'text', placeholder: 'e.g. Alex, Support Specialist at TechCorp',
-    keywords: ['chatbot','assistant','agent','coach','advisor','support','tutor','guide','character','bot','customer service','concierge','mentor','consultant','respond','answer user','talk to','speak to','help users','help customers','chat with','persona'],
-    anti: ['write code','script','function','pipeline','automat','batch process','parse','extract data','convert','classify','data analysis','sql','api endpoint'],
-    base: 0
-  },
-  {
-    id: 'audience', icon: '👥', label: 'Target Audience',
-    question: 'Who will be reading or receiving these responses?',
-    hint: 'Their background, technical level, and expectations shape vocabulary, depth, and tone.',
-    type: 'text', placeholder: 'e.g. Non-technical customers, or junior marketing managers at B2B companies',
-    keywords: ['write','content','article','blog','post','email','newsletter','marketing','reader','customer','client','users','public','student','employee','beginner','senior','person','people','audience','team','prospect','subscriber','member'],
-    anti: ['internal pipeline','api call','code function','data processing','batch','sql'],
-    base: 0
-  },
-  {
-    id: 'tone', icon: '🗣️', label: 'Tone & Communication Style',
-    question: 'What tone and communication style should it use?',
-    hint: 'Only ask this when the AI speaks to humans — skip for automated/internal workflows.',
-    type: 'select',
-    options: ['Friendly & casual','Professional & formal','Warm & empathetic','Direct & concise','Encouraging & motivational','Expert & authoritative','Playful & creative'],
-    keywords: ['customer','user','client','people','audience','chat','message','communicate','brand voice','support','marketing','public','engagement','tone','friendly','warm','empathy','speak','talk to'],
-    anti: ['parse','code','script','function','data process','convert','batch','classify','pipeline','automated'],
-    base: 0
-  },
-  {
-    id: 'document', icon: '📎', label: 'Reference Documents or Data',
-    question: 'Should the AI reference specific documents, data, or a knowledge base?',
-    hint: 'e.g. product manual, FAQ, pricing table, policy doc — we\'ll add a {{DOCUMENT}} placeholder.',
-    type: 'toggle_text',
-    toggleLabel: 'Yes — it needs to reference specific documents or data',
-    placeholder: 'Describe the document type (e.g. refund policy PDF, product catalogue, pricing tiers)',
-    keywords: ['document','knowledge base','faq','manual','guide','policy','procedure','catalogue','inventory','pricing','database','reference','spec','information','lookup','product info','knowledge','article','wiki','pdf','content library'],
-    anti: [], base: 1
-  },
-  {
-    id: 'domain', icon: '🔬', label: 'Domain & Expertise',
-    question: 'What specialised domain knowledge should it draw on?',
-    hint: 'This tells Claude how deep to go and what terminology to use.',
-    type: 'text', placeholder: 'e.g. B2B SaaS sales, corporate law, clinical nutrition, e-commerce operations',
-    keywords: ['legal','medical','financial','technical','scientific','engineering','healthcare','compliance','regulatory','tax','accounting','clinical','pharmaceutical','cybersecurity','architecture','specialized','expert','professional','industry','domain','niche','sector'],
-    anti: [], base: 0
-  },
-  {
-    id: 'constraints', icon: '🚧', label: 'Key Rules & Constraints',
-    question: 'Are there hard rules, limits, or things it must never do?',
-    hint: 'Brand guidelines, compliance rules, restricted topics, required disclaimers. One per line.',
-    type: 'textarea',
-    placeholder: 'Never discuss competitor pricing\nAlways add a legal disclaimer for financial advice\nOnly respond in formal English\nEscalate unresolved billing issues to billing@company.com',
-    keywords: ['rule','constraint','limit','must','never','always','policy','compliance','brand','guideline','restrict','avoid','prohibit','require','legal','privacy','confidential','safety','regulated','restricted','boundary','limit'],
-    anti: [], base: 2
-  },
-  {
-    id: 'format', icon: '📋', label: 'Output Format',
-    question: 'How should the AI format its responses?',
-    hint: 'Affects readability and how the output is used downstream.',
-    type: 'select',
-    options: ['Plain paragraphs (conversational)','Bullet points / lists','Numbered steps','Markdown (headers, bold, code blocks)','JSON object','XML tags','Response wrapped in <response> tags','Tables','Short & direct (1-2 sentences)'],
-    keywords: [], anti: [], base: 10
-  },
-  {
-    id: 'length', icon: '📏', label: 'Response Length & Depth',
-    question: 'How long or detailed should responses typically be?',
-    hint: 'Calibrates verbosity — prevents both too-short and overwhelming answers.',
-    type: 'select',
-    options: ['Very brief (1-2 sentences)','Short (1 paragraph)','Medium (2-4 paragraphs)','Detailed & comprehensive','Adaptive — short for simple, detailed for complex'],
-    keywords: ['write','essay','article','report','analysis','research','detailed','comprehensive','depth','thorough','blog','content','document','explain','describe','elaborate','long','in-depth'],
-    anti: ['quick reply','fast answer','instant','brief support','chat support'],
-    base: 0
-  },
-  {
-    id: 'escalation', icon: '🆘', label: 'Fallback & Escalation',
-    question: 'What should happen when the AI can\'t answer or is uncertain?',
-    hint: 'e.g. redirect to a human agent, say "I don\'t know", link to a help page.',
-    type: 'text', placeholder: 'e.g. Say "I\'m not sure — please email support@company.com for help"',
-    keywords: ['support','customer service','chatbot','agent','helpdesk','escalate','fallback','redirect','human agent','live chat','ticket','handoff','transfer','cannot answer','doesn\'t know','uncertain','out of scope'],
-    anti: ['writer','content creator','code','data analysis','internal','pipeline'],
-    base: 0
-  },
-  {
-    id: 'language', icon: '🌐', label: 'Language',
-    question: 'What language(s) should the AI respond in?',
-    hint: 'Specify if multilingual support or a specific language is required.',
-    type: 'text', placeholder: 'e.g. English only, or automatically match the user\'s language',
-    keywords: ['language','multilingual','international','global','translate','spanish','french','hindi','arabic','chinese','japanese','localize','regional','bilingual','non-english','multiple language'],
-    anti: [], base: 0
-  }
+  { id:'persona', icon:'persona', label:'AI Persona & Role',
+    question:'What persona or role should this AI take on?',
+    hint:'A named character with a company and job title makes responses far more consistent and on-brand.',
+    type:'text', placeholder:'e.g. Alex, Support Specialist at TechCorp',
+    keywords:['chatbot','assistant','agent','coach','advisor','support','tutor','guide','character','bot','customer service','concierge','mentor','consultant','respond','answer user','talk to','speak to','help users','help customers','chat with','persona'],
+    anti:['write code','script','function','pipeline','automat','batch process','parse','extract data','convert','classify','data analysis','sql','api endpoint'],
+    base:0 },
+  { id:'audience', icon:'users', label:'Target Audience',
+    question:'Who will be reading or receiving these responses?',
+    hint:'Their background, technical level, and expectations shape vocabulary, depth, and tone.',
+    type:'text', placeholder:'e.g. Non-technical customers, or junior marketing managers at B2B companies',
+    keywords:['write','content','article','blog','post','email','newsletter','marketing','reader','customer','client','users','public','student','employee','beginner','senior','person','people','audience','team','prospect','subscriber','member'],
+    anti:['internal pipeline','api call','code function','data processing','batch','sql'],
+    base:0 },
+  { id:'tone', icon:'mic', label:'Tone & Communication Style',
+    question:'What tone and communication style should it use?',
+    hint:'Only ask this when the AI speaks to humans — skip for automated/internal workflows.',
+    type:'select',
+    options:['Friendly & casual','Professional & formal','Warm & empathetic','Direct & concise','Encouraging & motivational','Expert & authoritative','Playful & creative'],
+    keywords:['customer','user','client','people','audience','chat','message','communicate','brand voice','support','marketing','public','engagement','tone','friendly','warm','empathy','speak','talk to'],
+    anti:['parse','code','script','function','data process','convert','batch','classify','pipeline','automated'],
+    base:0 },
+  { id:'document', icon:'paperclip', label:'Reference Documents or Data',
+    question:'Should the AI reference specific documents, data, or a knowledge base?',
+    hint:"e.g. product manual, FAQ, pricing table, policy doc — we'll add a {{DOCUMENT}} placeholder.",
+    type:'toggle_text',
+    toggleLabel:'Yes — it needs to reference specific documents or data',
+    placeholder:'Describe the document type (e.g. refund policy PDF, product catalogue, pricing tiers)',
+    keywords:['document','knowledge base','faq','manual','guide','policy','procedure','catalogue','inventory','pricing','database','reference','spec','information','lookup','product info','knowledge','article','wiki','pdf','content library'],
+    anti:[], base:1 },
+  { id:'domain', icon:'flask', label:'Domain & Expertise',
+    question:'What specialised domain knowledge should it draw on?',
+    hint:'This tells Claude how deep to go and what terminology to use.',
+    type:'text', placeholder:'e.g. B2B SaaS sales, corporate law, clinical nutrition, e-commerce operations',
+    keywords:['legal','medical','financial','technical','scientific','engineering','healthcare','compliance','regulatory','tax','accounting','clinical','pharmaceutical','cybersecurity','architecture','specialized','expert','professional','industry','domain','niche','sector'],
+    anti:[], base:0 },
+  { id:'constraints', icon:'shield', label:'Key Rules & Constraints',
+    question:"Are there hard rules, limits, or things it must never do?",
+    hint:'Brand guidelines, compliance rules, restricted topics, required disclaimers. One per line.',
+    type:'textarea',
+    placeholder:"Never discuss competitor pricing\nAlways add a legal disclaimer for financial advice\nOnly respond in formal English\nEscalate unresolved billing issues to billing@company.com",
+    keywords:['rule','constraint','limit','must','never','always','policy','compliance','brand','guideline','restrict','avoid','prohibit','require','legal','privacy','confidential','safety','regulated','restricted','boundary','limit'],
+    anti:[], base:2 },
+  { id:'format', icon:'list', label:'Output Format',
+    question:'How should the AI format its responses?',
+    hint:'Affects readability and how the output is used downstream.',
+    type:'select',
+    options:['Plain paragraphs (conversational)','Bullet points / lists','Numbered steps','Markdown (headers, bold, code blocks)','JSON object','XML tags','Response wrapped in <response> tags','Tables','Short & direct (1-2 sentences)'],
+    keywords:[], anti:[], base:10 },
+  { id:'length', icon:'ruler', label:'Response Length & Depth',
+    question:'How long or detailed should responses typically be?',
+    hint:'Calibrates verbosity — prevents both too-short and overwhelming answers.',
+    type:'select',
+    options:['Very brief (1-2 sentences)','Short (1 paragraph)','Medium (2-4 paragraphs)','Detailed & comprehensive','Adaptive — short for simple, detailed for complex'],
+    keywords:['write','essay','article','report','analysis','research','detailed','comprehensive','depth','thorough','blog','content','document','explain','describe','elaborate','long','in-depth'],
+    anti:['quick reply','fast answer','instant','brief support','chat support'],
+    base:0 },
+  { id:'escalation', icon:'alert', label:'Fallback & Escalation',
+    question:"What should happen when the AI can't answer or is uncertain?",
+    hint:'e.g. redirect to a human agent, say "I don\'t know", link to a help page.',
+    type:'text', placeholder:"e.g. Say \"I'm not sure — please email support@company.com for help\"",
+    keywords:['support','customer service','chatbot','agent','helpdesk','escalate','fallback','redirect','human agent','live chat','ticket','handoff','transfer','cannot answer','uncertain','out of scope'],
+    anti:['writer','content creator','code','data analysis','internal','pipeline'],
+    base:0 },
+  { id:'language', icon:'globe', label:'Language',
+    question:'What language(s) should the AI respond in?',
+    hint:'Specify if multilingual support or a specific language is required.',
+    type:'text', placeholder:"e.g. English only, or automatically match the user's language",
+    keywords:['language','multilingual','international','global','translate','spanish','french','hindi','arabic','chinese','japanese','localize','regional','bilingual','non-english','multiple language'],
+    anti:[], base:0 }
 ];
+
+/* SVG icon map (no-emoji-icons rule — UI/UX Pro Max) */
+const ICONS = {
+  persona:    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+  users:      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+  mic:        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>`,
+  paperclip:  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>`,
+  flask:      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6m-6 0v6l-5 11a1 1 0 0 0 .93 1.38h10.14A1 1 0 0 0 22 20l-5-11V3"/></svg>`,
+  shield:     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+  list:       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>`,
+  ruler:      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="21"/><polyline points="7 6 12 1 17 6"/><polyline points="7 18 12 23 17 18"/></svg>`,
+  alert:      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
+  globe:      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
+};
 
 /* ─── SCORING ───────────────────────────────────────────────── */
 function scoreQ(q, idea) {
-  const t = idea.toLowerCase();
-  let s = q.base;
-  q.keywords.forEach(kw => { if (t.includes(kw.toLowerCase())) s += 2; });
-  q.anti.forEach(kw => { if (t.includes(kw.toLowerCase())) s -= 3; });
+  const t = idea.toLowerCase(); let s = q.base;
+  q.keywords.forEach(kw => { if (t.includes(kw)) s += 2; });
+  q.anti.forEach(kw => { if (t.includes(kw)) s -= 3; });
   return Math.max(0, s);
 }
-
 function getRelevantQuestions(idea) {
   const MIN = 2, MAX = 8;
   const scored = Q_POOL.map(q => ({ ...q, score: scoreQ(q, idea) })).filter(q => q.score >= MIN);
-  const fmt  = scored.find(q => q.id === 'format');
+  const fmt = scored.find(q => q.id === 'format');
   const rest = scored.filter(q => q.id !== 'format').sort((a,b) => b.score - a.score);
   const picked = rest.slice(0, MAX - 1);
   if (fmt) picked.push(fmt);
   return picked;
 }
-
 function detectContext(idea) {
   const t = idea.toLowerCase();
-  if (/chatbot|support agent|customer service|helpdesk|live chat/.test(t)) return '💬 Conversational Agent';
-  if (/content|blog|article|newsletter|caption|copywriting/.test(t))       return '✍️ Content & Writing';
-  if (/coach|tutor|mentor|teach|learn|study/.test(t))                       return '🎓 Education & Coaching';
-  if (/sales|outreach|prospect|lead|pitch|crm/.test(t))                     return '📈 Sales Enablement';
-  if (/code|review|debug|refactor|developer|engineer|software/.test(t))     return '💻 Developer Tool';
-  if (/data|analys|report|dashboard|sql|pipeline|automat/.test(t))         return '📊 Data & Automation';
-  if (/legal|medical|financial|compliance|regulatory/.test(t))              return '⚖️ Specialised Domain';
-  return '🤖 AI Assistant';
+  if (/chatbot|support agent|customer service|helpdesk|live chat/.test(t)) return 'Conversational Agent';
+  if (/content|blog|article|newsletter|caption|copywriting/.test(t))       return 'Content & Writing';
+  if (/coach|tutor|mentor|teach|learn|study/.test(t))                       return 'Education & Coaching';
+  if (/sales|outreach|prospect|lead|pitch|crm/.test(t))                     return 'Sales Enablement';
+  if (/code|review|debug|refactor|developer|engineer|software/.test(t))     return 'Developer Tool';
+  if (/data|analys|report|dashboard|sql|pipeline|automat/.test(t))         return 'Data & Automation';
+  if (/legal|medical|financial|compliance|regulatory/.test(t))              return 'Specialised Domain';
+  return 'AI Assistant';
 }
 
 /* ─── RENDER QUESTIONS ──────────────────────────────────────── */
@@ -1023,62 +999,66 @@ function renderQuestions(questions, idea) {
 
     let inputHTML = '';
     if (q.type === 'text') {
-      inputHTML = `<input type="text" id="dq_${q.id}" class="dyn-input" placeholder="${q.placeholder || ''}" oninput="updateProgress()" />`;
+      inputHTML = `<input type="text" id="dq_${q.id}" class="dyn-input" placeholder="${escHtml(q.placeholder || '')}" oninput="updateProgress()" aria-label="${escHtml(q.label)}" />`;
     } else if (q.type === 'textarea') {
-      inputHTML = `<textarea id="dq_${q.id}" class="dyn-input" placeholder="${q.placeholder || ''}" rows="4" oninput="updateProgress()"></textarea>`;
+      inputHTML = `<textarea id="dq_${q.id}" class="dyn-input" placeholder="${escHtml(q.placeholder || '')}" rows="4" oninput="updateProgress()" aria-label="${escHtml(q.label)}"></textarea>`;
     } else if (q.type === 'select') {
       const opts = q.options.map(o => `<option value="${escHtml(o)}">${escHtml(o)}</option>`).join('');
-      inputHTML = `<select id="dq_${q.id}" class="dyn-input" onchange="updateProgress()"><option value="">— Select —</option>${opts}</select>`;
+      inputHTML = `<select id="dq_${q.id}" class="dyn-input" onchange="updateProgress()" aria-label="${escHtml(q.label)}"><option value="">— Select —</option>${opts}</select>`;
     } else if (q.type === 'toggle_text') {
       inputHTML = `
-        <label class="toggle-row" id="dq_${q.id}_row" onclick="toggleDetail('${q.id}',this)">
-          <input type="checkbox" id="dq_${q.id}_chk" onclick="event.stopPropagation();toggleDetail('${q.id}',document.getElementById('dq_${q.id}_row'))" />
+        <label class="toggle-row" id="dq_${q.id}_row">
+          <input type="checkbox" id="dq_${q.id}_chk" onchange="toggleDetail('${q.id}')" aria-expanded="false" />
           ${escHtml(q.toggleLabel)}
         </label>
         <div class="toggle-detail hidden" id="dq_${q.id}_detail">
-          <input type="text" id="dq_${q.id}" class="dyn-input" placeholder="${escHtml(q.placeholder || '')}" oninput="updateProgress()" />
+          <input type="text" id="dq_${q.id}" class="dyn-input" placeholder="${escHtml(q.placeholder || '')}" oninput="updateProgress()" aria-label="${escHtml(q.label)} detail" />
         </div>`;
     }
 
+    const iconSvg = ICONS[q.icon] || ICONS['list'];
     wrap.innerHTML = `
-      <div class="dyn-q-num">${i + 1}</div>
+      <div class="dyn-q-num" aria-hidden="true">${i + 1}</div>
       <div class="dyn-q-body">
-        <div class="dyn-q-label"><span class="icon">${q.icon}</span> ${escHtml(q.label)}</div>
-        <div class="dyn-q-hint">${escHtml(q.hint)}</div>
+        <div class="dyn-q-label">${iconSvg} ${escHtml(q.label)}</div>
+        <div class="dyn-q-hint" id="hint_${q.id}">${escHtml(q.hint)}</div>
         ${inputHTML}
       </div>`;
     container.appendChild(wrap);
   });
-
   updateProgress();
 }
 
-function toggleDetail(qid, rowEl) {
+function toggleDetail(qid) {
   const chk    = document.getElementById(`dq_${qid}_chk`);
   const detail = document.getElementById(`dq_${qid}_detail`);
+  const row    = document.getElementById(`dq_${qid}_row`);
   if (!chk || !detail) return;
   const checked = chk.checked;
   detail.classList.toggle('hidden', !checked);
-  if (rowEl) rowEl.classList.toggle('checked', checked);
+  if (row) row.classList.toggle('checked', checked);
+  chk.setAttribute('aria-expanded', checked ? 'true' : 'false');
   updateProgress();
 }
 
+/* ─── PROGRESS ──────────────────────────────────────────────── */
 function updateProgress() {
   const inputs = document.querySelectorAll('.dyn-input');
   const checks = document.querySelectorAll('.dyn-q [type="checkbox"]');
   let filled = 0, total = 0;
   inputs.forEach(el => {
     if (el.closest('.hidden')) return;
-    total++;
-    if (el.value.trim()) filled++;
+    total++; if (el.value.trim()) filled++;
   });
   checks.forEach(el => { total++; if (el.checked) filled++; });
   const pct = total ? Math.round((filled / total) * 100) : 0;
   document.getElementById('progressFill').style.width = pct + '%';
+  const bar = document.getElementById('progressBarEl');
+  if (bar) bar.setAttribute('aria-valuenow', pct);
   document.getElementById('progressLabel').textContent =
-    pct === 100 ? '✓ All filled — ready to generate!' :
+    pct === 100 ? 'All filled — ready to generate!' :
     pct > 50    ? `${pct}% filled — keep going or generate now.` :
-                  'Fill in what you know — skip anything that doesn\'t apply.';
+                  "Fill in what you know — skip anything that doesn't apply.";
 }
 
 /* ─── STEP NAV ──────────────────────────────────────────────── */
@@ -1087,25 +1067,33 @@ function showStep(n) {
   document.getElementById('step2Card').classList.toggle('hidden', n !== 2);
   document.getElementById('step3Card').classList.toggle('hidden', n !== 3);
   document.getElementById('tipsPanel').classList.toggle('hidden', n === 3);
-
   ['pip1','pip2','pip3'].forEach((id, i) => {
     const el = document.getElementById(id);
     el.classList.remove('active','done');
     if (i + 1 <  n) el.classList.add('done');
-    if (i + 1 === n) el.classList.add('active');
+    if (i + 1 === n) { el.classList.add('active'); el.setAttribute('aria-current', 'step'); }
+    else el.removeAttribute('aria-current');
   });
-  // connectors
   ['conn1','conn2'].forEach((id, i) => {
     const el = document.getElementById(id);
     if (el) el.classList.toggle('done', n > i + 1);
   });
-
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function goToStep2() {
   const idea = document.getElementById('ideaInput').value.trim();
-  if (!idea) { showToast('Please describe your idea first.'); return; }
+  if (!idea) {
+    // Show accessible error (aria-live assertive)
+    document.getElementById('errorRegion').textContent = 'Please describe your idea before continuing.';
+    showToast('Please describe your idea first.');
+    document.getElementById('ideaInput').focus();
+    return;
+  }
+  // Loading state on button (loading-buttons rule)
+  const btn = document.getElementById('step1Btn');
+  btn.disabled = true;
+  btn.innerHTML = `<div class="btn-spinner"></div> Analysing…`;
 
   showStep(2);
   document.getElementById('analyzingState').classList.remove('hidden');
@@ -1120,6 +1108,9 @@ function goToStep2() {
     }
     document.getElementById('analyzingState').classList.add('hidden');
     document.getElementById('questionsWrap').classList.remove('hidden');
+    // Restore button
+    btn.disabled = false;
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Analyse &amp; Get Questions`;
   }, 750);
 }
 
@@ -1127,14 +1118,11 @@ function goToStep2() {
 function collectAnswers() {
   const ans = {};
   document.querySelectorAll('.dyn-q').forEach(wrap => {
-    const qid   = wrap.dataset.qid;
+    const qid = wrap.dataset.qid;
     const input = wrap.querySelector('.dyn-input');
     const chk   = wrap.querySelector('[type="checkbox"]');
-    if (chk) {
-      ans[qid] = chk.checked ? (input ? input.value.trim() : 'yes') : '';
-    } else if (input) {
-      ans[qid] = input.value.trim();
-    }
+    if (chk) { ans[qid] = chk.checked ? (input ? input.value.trim() : 'yes') : ''; }
+    else if (input) { ans[qid] = input.value.trim(); }
   });
   return ans;
 }
@@ -1145,21 +1133,19 @@ function generatePrompt() {
   const ans  = collectAnswers();
   const { persona='', audience='', tone='', document:useDocRaw='', domain='',
           constraints:rules='', format='', length='', escalation='', language='' } = ans;
-  const useDoc   = !!useDocRaw;
-  const docLabel = useDocRaw || 'reference document';
+  const useDoc = !!useDocRaw, docLabel = useDocRaw || 'reference document';
   const personaName = persona ? persona.split(',')[0].trim() : 'AI Assistant';
   const parts = [];
 
   let ctx = `[Task Context]\n`;
   ctx += persona ? `You will act as ${persona}.\n` : `You are a helpful AI assistant.\n`;
   ctx += `Your primary goal: ${idea}.\n`;
-  if (audience)  ctx += `You are responding to: ${audience}.\n`;
-  if (domain)    ctx += `You draw on expertise in: ${domain}.\n`;
+  if (audience) ctx += `You are responding to: ${audience}.\n`;
+  if (domain)   ctx += `You draw on expertise in: ${domain}.\n`;
   parts.push(ctx.trim());
 
   if (tone) parts.push(`[Tone]\nMaintain a ${tone.toLowerCase()} throughout every interaction. This should be consistent regardless of the topic or complexity of the request.`);
   if (language) parts.push(`[Language]\n${language}.`);
-
   if (useDoc) parts.push(`[Data / Docs]\nHere is the ${docLabel} you must consult when formulating responses:\n<guide>\n{{DOCUMENT}}\n</guide>\nAlways prioritise this document over your general knowledge. If the document doesn't cover a question, say so clearly.`);
 
   const baseRules = [
@@ -1169,7 +1155,6 @@ function generatePrompt() {
   if (escalation) baseRules.push(`- ${escalation}`);
   const userRules = rules ? rules.split('\n').filter(r => r.trim()).map(r => `- ${r.trim()}`) : [];
   parts.push(`[Rules]\nHere are the important rules for every interaction:\n${[...userRules, ...baseRules].join('\n')}`);
-
   parts.push(`[History]\nConversation history (may be empty on first message):\n<history>\n{{HISTORY}}\n</history>\n\nUser's current message:\n<question>\n{{QUESTION}}\n</question>`);
   parts.push(`[Immediate Request]\nHow do you respond to the user's message as ${personaName}?`);
   parts.push(`[Think step by step]\nBefore replying, think through: the user's actual need, the relevant rules, and the best way to help. Then respond.`);
@@ -1190,25 +1175,27 @@ function generatePrompt() {
     ? '\n\n---\n\nAssistant (prefill):\n<response>' : '';
   const final = fullPrompt + prefill;
   const tokens = Math.round(final.length / 4);
-  const docFlag = useDoc ? '<span>📎 {{DOCUMENT}}</span>' : '';
+  const docFlag = useDoc ? '<span>{{DOCUMENT}} required</span>' : '';
 
   document.getElementById('promptMeta').innerHTML = `
-    <span>📐 ~${tokens} tokens</span>
-    <span>📝 ${parts.length} sections</span>
+    <span>~${tokens} tokens</span>
+    <span>${parts.length} sections</span>
     ${docFlag}
-    <span>🔢 {{HISTORY}} + {{QUESTION}}</span>`;
+    <span>{{HISTORY}} + {{QUESTION}}</span>`;
   document.getElementById('promptOutput').textContent = final;
   showStep(3);
 }
 
 /* ─── COPY / DOWNLOAD ───────────────────────────────────────── */
 function copyPrompt() {
-  navigator.clipboard.writeText(document.getElementById('promptOutput').textContent).then(() => {
+  const text = document.getElementById('promptOutput').textContent;
+  navigator.clipboard.writeText(text).then(() => {
     const btn = document.getElementById('copyBtn');
-    btn.textContent = '✓ Copied!';
+    const orig = btn.innerHTML;
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Copied!`;
     btn.classList.add('copy-success');
     showToast('Prompt copied to clipboard!');
-    setTimeout(() => { btn.textContent = '📋 Copy Prompt'; btn.classList.remove('copy-success'); }, 2000);
+    setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copy-success'); }, 2000);
   });
 }
 function downloadPrompt() {
@@ -1248,7 +1235,7 @@ function showToast(msg) {
   document.getElementById('toastMsg').textContent = msg;
   const t = document.getElementById('toast');
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2800);
+  setTimeout(() => t.classList.remove('show'), 2800); /* toast-dismiss: 3-5s */
 }
 
 /* ─── ESCAPE HTML ───────────────────────────────────────────── */
@@ -1261,7 +1248,11 @@ let dark = false;
 document.getElementById('themeToggle').addEventListener('click', () => {
   dark = !dark;
   document.documentElement.setAttribute('data-theme', dark ? 'dark' : '');
-  document.getElementById('themeToggle').textContent = dark ? '☀️' : '🌙';
+  /* Swap moon ↔ sun SVG */
+  document.getElementById('themeIcon').innerHTML = dark
+    ? `<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>`
+    : `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;
+  document.getElementById('themeToggle').setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
 });
 
 /* ─── TEMPLATES ─────────────────────────────────────────────── */
@@ -1294,14 +1285,15 @@ const TEMPLATES = {
 
 function applyTemplateAnswers(answers, questions) {
   questions.forEach(q => {
-    const val = answers[q.id];
-    if (!val) return;
+    const val = answers[q.id]; if (!val) return;
     if (q.type === 'toggle_text') {
       const chk = document.getElementById(`dq_${q.id}_chk`);
-      const row = document.getElementById(`dq_${q.id}_row`);
       const det = document.getElementById(`dq_${q.id}_detail`);
+      const row = document.getElementById(`dq_${q.id}_row`);
       const inp = document.getElementById(`dq_${q.id}`);
-      if (chk) { chk.checked = true; if (row) row.classList.add('checked'); if (det) det.classList.remove('hidden'); }
+      if (chk) { chk.checked = true; chk.setAttribute('aria-expanded','true'); }
+      if (row) row.classList.add('checked');
+      if (det) det.classList.remove('hidden');
       if (inp) inp.value = val;
     } else {
       const el = document.getElementById(`dq_${q.id}`);
@@ -1312,14 +1304,14 @@ function applyTemplateAnswers(answers, questions) {
 }
 
 function loadTemplate(key, evt) {
-  const t = TEMPLATES[key];
-  if (!t) return;
+  const t = TEMPLATES[key]; if (!t) return;
   document.getElementById('ideaInput').value = t.idea;
   onIdeaInput();
   document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-  if (evt && evt.target) evt.target.classList.add('active');
+  const btn = evt?.currentTarget || evt?.target;
+  if (btn) btn.classList.add('active');
   window._templateAnswers = t.answers;
-  const label = evt?.target?.textContent?.replace(/^[^\w]+/, '') || key;
+  const label = btn?.textContent?.trim() || key;
   showToast(`"${label}" template loaded — click Analyse to continue.`);
 }
 </script>

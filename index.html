@@ -3,320 +3,733 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Prompt Architect — Build Better Claude Prompts in 60 Seconds</title>
+  <title>Prompt Architect — Claude Prompt Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     /* ─── RESET & BASE ─────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --brand:      #D97757;
-      --brand-dark: #B85F3E;
-      --brand-lt:   #FAE9E2;
-      --bg:         #F9F7F4;
-      --card:       #FFFFFF;
-      --border:     #E8E3DC;
-      --text:       #1A1714;
-      --muted:      #6E6460;
-      --success:    #2D7B53;
-      --radius:     12px;
-      --shadow:     0 2px 12px rgba(0,0,0,.08);
-      --t:          .2s ease;
+      --brand:        #E8714A;
+      --brand-dark:   #C4562F;
+      --brand-light:  #FF8F68;
+      --brand-lt:     #FDF0EB;
+      --brand-border: rgba(232,113,74,.2);
+      --bg:           #F6F4F1;
+      --bg-2:         #EFECE8;
+      --card:         #FFFFFF;
+      --border:       #E4DFD8;
+      --border-light: #EDE9E3;
+      --text:         #1C1916;
+      --text-2:       #3D3733;
+      --muted:        #7A7370;
+      --success:      #1E7A4A;
+      --success-lt:   #E8F5EE;
+      --radius:       14px;
+      --radius-sm:    8px;
+      --shadow-sm:    0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+      --shadow:       0 4px 16px rgba(0,0,0,.07), 0 1px 4px rgba(0,0,0,.04);
+      --shadow-lg:    0 12px 40px rgba(0,0,0,.1), 0 4px 12px rgba(0,0,0,.05);
+      --shadow-brand: 0 8px 28px rgba(232,113,74,.28);
+      --t:            .2s ease;
+      --t-spring:     .3s cubic-bezier(.34,1.56,.64,1);
     }
     [data-theme="dark"] {
-      --bg:       #16120F;
-      --card:     #221E1A;
-      --border:   #35302A;
-      --text:     #F0EBE4;
-      --muted:    #9E9089;
-      --brand-lt: #3A2218;
+      --bg:           #141210;
+      --bg-2:         #1C1916;
+      --card:         #211E1A;
+      --border:       #322D27;
+      --border-light: #2A2520;
+      --text:         #F2EDE6;
+      --text-2:       #C8BFB5;
+      --muted:        #8A817A;
+      --brand-lt:     #2D1A10;
+      --brand-border: rgba(232,113,74,.15);
+      --success-lt:   #0F2018;
     }
+
     html { scroll-behavior: smooth; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--bg); color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
       min-height: 100vh;
       transition: background var(--t), color var(--t);
+      -webkit-font-smoothing: antialiased;
     }
+
+    /* ─── BACKGROUND TEXTURE ────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
+      background-size: 28px 28px;
+      opacity: .45;
+      pointer-events: none;
+      z-index: 0;
+    }
+    header, .hero, .container, footer { position: relative; z-index: 1; }
 
     /* ─── HEADER ───────────────────────────────────────────────── */
     header {
       position: sticky; top: 0; z-index: 100;
-      background: var(--card); border-bottom: 1px solid var(--border);
-      padding: 0 24px; height: 60px;
+      background: rgba(255,255,255,.82);
+      border-bottom: 1px solid var(--border);
+      padding: 0 28px; height: 62px;
       display: flex; align-items: center; justify-content: space-between;
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
     }
-    .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; }
+    [data-theme="dark"] header {
+      background: rgba(33,30,26,.88);
+    }
+    .logo {
+      display: flex; align-items: center; gap: 11px;
+      font-weight: 800; font-size: 17px; letter-spacing: -.3px;
+      text-decoration: none; color: var(--text);
+    }
     .logo-icon {
-      width: 34px; height: 34px; border-radius: 8px; background: var(--brand);
-      display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px;
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 17px;
+      box-shadow: 0 3px 10px rgba(232,113,74,.35);
     }
     .logo span { color: var(--brand); }
+
     .header-actions { display: flex; gap: 8px; align-items: center; }
     .icon-btn {
-      width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border);
+      width: 36px; height: 36px; border-radius: 9px;
+      border: 1px solid var(--border);
       background: var(--card); color: var(--muted); cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      font-size: 16px; transition: all var(--t);
+      font-size: 15px; transition: all var(--t);
     }
-    .icon-btn:hover { background: var(--brand-lt); color: var(--brand); }
+    .icon-btn:hover {
+      background: var(--brand-lt);
+      border-color: var(--brand-border);
+      color: var(--brand);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
 
     /* ─── HERO ─────────────────────────────────────────────────── */
     .hero {
-      text-align: center; padding: 56px 24px 36px;
-      max-width: 680px; margin: 0 auto;
+      text-align: center;
+      padding: 64px 24px 40px;
+      max-width: 700px; margin: 0 auto;
+      position: relative;
     }
+    /* Decorative gradient blobs */
+    .hero::before, .hero::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: .12;
+      pointer-events: none;
+    }
+    .hero::before {
+      width: 320px; height: 320px;
+      background: var(--brand);
+      top: -40px; left: -60px;
+    }
+    .hero::after {
+      width: 240px; height: 240px;
+      background: #7B61FF;
+      bottom: 0; right: -40px;
+    }
+
     .badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: var(--brand-lt); color: var(--brand);
-      font-size: 12px; font-weight: 600; letter-spacing: .5px;
-      padding: 4px 12px; border-radius: 100px;
-      margin-bottom: 18px; text-transform: uppercase;
+      display: inline-flex; align-items: center; gap: 7px;
+      background: var(--brand-lt);
+      border: 1px solid var(--brand-border);
+      color: var(--brand);
+      font-size: 11.5px; font-weight: 700; letter-spacing: .6px;
+      padding: 5px 14px; border-radius: 100px;
+      margin-bottom: 22px; text-transform: uppercase;
     }
+    .badge-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--brand);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .6; transform: scale(.8); }
+    }
+
     .hero h1 {
-      font-size: clamp(26px, 5vw, 42px); font-weight: 800;
-      line-height: 1.15; margin-bottom: 14px;
+      font-size: clamp(28px, 5vw, 46px);
+      font-weight: 900;
+      line-height: 1.12;
+      letter-spacing: -1.5px;
+      margin-bottom: 16px;
     }
-    .hero h1 em { color: var(--brand); font-style: normal; }
-    .hero p { font-size: 16px; color: var(--muted); line-height: 1.7; margin-bottom: 28px; }
-    .value-strip {
-      display: flex; justify-content: center; gap: 24px; flex-wrap: wrap;
-      font-size: 13px; font-weight: 600; color: var(--muted);
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      font-size: 16.5px; color: var(--muted);
+      line-height: 1.75; margin-bottom: 36px;
+      max-width: 540px; margin-left: auto; margin-right: auto;
       margin-bottom: 36px;
     }
-    .value-strip span { display: flex; align-items: center; gap: 5px; }
-    .value-strip span::before { content: "✓"; color: var(--success); font-weight: 700; }
-    .steps-overview { display: flex; justify-content: center; margin-bottom: 14px; }
-    .step-pip { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--muted); font-weight: 500; }
-    .step-pip .num {
-      width: 26px; height: 26px; border-radius: 50%;
-      background: var(--border); color: var(--muted);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: 700;
+
+    /* ─── STEP INDICATOR ────────────────────────────────────────── */
+    .steps-overview {
+      display: flex; justify-content: center; align-items: center;
+      margin-bottom: 44px; gap: 0;
     }
-    .step-pip.active .num { background: var(--brand); color: #fff; }
+    .step-pip {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      font-size: 12px; color: var(--muted); font-weight: 600;
+      letter-spacing: .2px;
+      transition: color var(--t);
+    }
+    .step-pip .num {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--card);
+      border: 2px solid var(--border);
+      color: var(--muted);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700;
+      transition: all var(--t-spring);
+      box-shadow: var(--shadow-sm);
+    }
+    .step-pip.active .num {
+      background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(232,113,74,.4);
+      transform: scale(1.08);
+    }
     .step-pip.active { color: var(--text); }
-    .step-pip.done .num { background: var(--success); color: #fff; }
-    .step-connector { width: 28px; height: 1px; background: var(--border); margin: 0 4px; }
+    .step-pip.done .num {
+      background: var(--success);
+      border-color: transparent;
+      color: #fff;
+    }
+    .step-pip.done { color: var(--success); }
+    .step-connector {
+      width: 56px; height: 2px;
+      background: var(--border);
+      margin: 0 2px;
+      margin-bottom: 26px;
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+    }
+    .step-connector.done {
+      background: var(--success);
+    }
 
     /* ─── LAYOUT ───────────────────────────────────────────────── */
-    .container { max-width: 820px; margin: 0 auto; padding: 0 24px 80px; }
+    .container { max-width: 860px; margin: 0 auto; padding: 0 24px 100px; }
 
     /* ─── CARD ─────────────────────────────────────────────────── */
     .card {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: var(--radius); box-shadow: var(--shadow);
-      padding: 32px; margin-bottom: 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 32px;
+      margin-bottom: 20px;
+      transition: box-shadow var(--t), border-color var(--t);
     }
-    .card-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 24px; }
+    .card:hover { box-shadow: var(--shadow-lg); }
+
+    .card-header {
+      display: flex; align-items: flex-start; gap: 16px;
+      margin-bottom: 28px;
+    }
     .card-icon {
-      width: 42px; height: 42px; border-radius: 10px;
-      background: var(--brand-lt); color: var(--brand);
+      width: 46px; height: 46px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--brand-lt), rgba(232,113,74,.08));
+      border: 1px solid var(--brand-border);
+      color: var(--brand);
       display: flex; align-items: center; justify-content: center;
-      font-size: 20px; flex-shrink: 0;
+      font-size: 22px; flex-shrink: 0;
     }
-    .card-title { font-size: 20px; font-weight: 700; }
-    .card-sub { font-size: 14px; color: var(--muted); margin-top: 3px; }
+    .card-title {
+      font-size: 19px; font-weight: 800;
+      letter-spacing: -.4px; margin-bottom: 4px;
+    }
+    .card-sub { font-size: 14px; color: var(--muted); line-height: 1.6; }
 
     /* ─── FORM ─────────────────────────────────────────────────── */
-    .field { margin-bottom: 20px; }
-    label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 7px; }
-    label .tip { font-weight: 400; color: var(--muted); font-size: 12px; display: block; margin-top: 2px; }
+    .field { margin-bottom: 22px; }
+    label {
+      display: block; font-size: 13.5px;
+      font-weight: 700; margin-bottom: 8px;
+      color: var(--text-2);
+    }
+    label .tip {
+      font-weight: 400; color: var(--muted);
+      font-size: 12.5px; display: block;
+      margin-top: 3px; line-height: 1.5;
+    }
     input[type="text"], textarea, select {
-      width: 100%; padding: 11px 14px;
-      border: 1.5px solid var(--border); border-radius: 8px;
-      font-size: 15px; background: var(--bg); color: var(--text);
-      transition: border-color var(--t), box-shadow var(--t);
-      outline: none; font-family: inherit;
+      width: 100%; padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 14.5px;
+      background: var(--bg);
+      color: var(--text);
+      transition: border-color var(--t), box-shadow var(--t), background var(--t);
+      outline: none;
+      font-family: 'Inter', sans-serif;
     }
     input[type="text"]:focus, textarea:focus, select:focus {
       border-color: var(--brand);
-      box-shadow: 0 0 0 3px rgba(217,119,87,.15);
+      box-shadow: 0 0 0 3.5px rgba(232,113,74,.12);
+      background: var(--card);
     }
-    textarea { resize: vertical; min-height: 120px; line-height: 1.6; }
-    .char-count { font-size: 12px; text-align: right; margin-top: 4px; color: var(--muted); }
-    .char-count.warn { color: var(--brand); }
+    input[type="text"]::placeholder, textarea::placeholder {
+      color: var(--muted); opacity: .7;
+    }
+    textarea { resize: vertical; min-height: 130px; line-height: 1.65; }
+    select { cursor: pointer; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237A7370' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center;
+      padding-right: 40px;
+    }
+    .char-count {
+      font-size: 12px; text-align: right;
+      margin-top: 6px; color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .char-count.warn { color: var(--brand); font-weight: 600; }
 
     /* ─── BUTTONS ──────────────────────────────────────────────── */
     .btn {
       display: inline-flex; align-items: center; gap: 8px;
-      padding: 11px 22px; border-radius: 8px;
-      font-size: 15px; font-weight: 600; cursor: pointer;
+      padding: 11px 22px; border-radius: var(--radius-sm);
+      font-size: 14.5px; font-weight: 700; cursor: pointer;
       border: none; transition: all var(--t);
+      font-family: 'Inter', sans-serif;
+      letter-spacing: -.1px;
     }
-    .btn-primary { background: var(--brand); color: #fff; }
-    .btn-primary:hover { background: var(--brand-dark); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(217,119,87,.35); }
-    .btn-secondary { background: var(--bg); color: var(--text); border: 1.5px solid var(--border); }
-    .btn-secondary:hover { background: var(--brand-lt); border-color: var(--brand); color: var(--brand); }
-    .btn-ghost { background: transparent; color: var(--muted); padding: 8px 12px; font-size: 13px; }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(232,113,74,.3);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, var(--brand-light), var(--brand));
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-brand);
+    }
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-secondary {
+      background: var(--card);
+      color: var(--text-2);
+      border: 1.5px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+    .btn-secondary:hover {
+      background: var(--brand-lt);
+      border-color: var(--brand-border);
+      color: var(--brand);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      padding: 8px 12px;
+      font-size: 13.5px;
+      font-weight: 600;
+    }
     .btn-ghost:hover { color: var(--brand); }
     .btn-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
     /* ─── TEMPLATES ────────────────────────────────────────────── */
-    .template-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
-    .chip {
-      padding: 6px 14px; border-radius: 100px;
-      font-size: 13px; font-weight: 500;
-      background: var(--bg); border: 1.5px solid var(--border); color: var(--muted);
-      cursor: pointer; transition: all var(--t);
+    .template-label {
+      font-size: 12px; font-weight: 700; letter-spacing: .5px;
+      text-transform: uppercase; color: var(--muted);
+      margin-bottom: 12px;
     }
-    .chip:hover { background: var(--brand-lt); border-color: var(--brand); color: var(--brand); }
-    .chip.active { background: var(--brand); border-color: var(--brand); color: #fff; }
+    .template-row {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px;
+    }
+    .chip {
+      padding: 7px 16px; border-radius: 100px;
+      font-size: 13px; font-weight: 600;
+      background: var(--bg-2);
+      border: 1.5px solid var(--border);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all var(--t-spring);
+      white-space: nowrap;
+    }
+    .chip:hover {
+      background: var(--brand-lt);
+      border-color: var(--brand-border);
+      color: var(--brand);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(232,113,74,.15);
+    }
+    .chip.active {
+      background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(232,113,74,.3);
+    }
 
     /* ─── PROGRESS ─────────────────────────────────────────────── */
-    .progress-bar { height: 3px; background: var(--border); border-radius: 2px; margin-bottom: 4px; overflow: hidden; }
-    .progress-fill { height: 100%; background: var(--brand); border-radius: 2px; transition: width .4s ease; }
-    .progress-label { font-size: 12px; color: var(--muted); margin-bottom: 24px; }
+    .progress-bar {
+      height: 4px; background: var(--border);
+      border-radius: 2px; margin-bottom: 6px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--brand), var(--brand-light));
+      border-radius: 2px;
+      transition: width .45s cubic-bezier(.4,0,.2,1);
+    }
+    .progress-label {
+      font-size: 12.5px; color: var(--muted);
+      margin-bottom: 28px;
+      font-weight: 500;
+    }
 
-    /* ─── ANALYZING STATE ───────────────────────────────────────── */
+    /* ─── ANALYZING STATE ────────────────────────────────────────── */
     .analyzing-state {
       display: flex; flex-direction: column; align-items: center;
-      padding: 48px 0; gap: 16px; text-align: center;
+      padding: 56px 0; gap: 18px; text-align: center;
+    }
+    .spinner-wrap {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--brand-lt);
+      border: 1px solid var(--brand-border);
+      display: flex; align-items: center; justify-content: center;
     }
     .spinner {
-      width: 38px; height: 38px; border-radius: 50%;
-      border: 3px solid var(--border); border-top-color: var(--brand);
-      animation: spin .75s linear infinite;
+      width: 30px; height: 30px; border-radius: 50%;
+      border: 2.5px solid var(--border);
+      border-top-color: var(--brand);
+      animation: spin .7s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .analyzing-state h3 { font-size: 16px; font-weight: 700; }
-    .analyzing-state p { font-size: 14px; color: var(--muted); max-width: 360px; line-height: 1.5; }
+    .analyzing-state h3 {
+      font-size: 17px; font-weight: 800; letter-spacing: -.3px;
+    }
+    .analyzing-state p {
+      font-size: 14px; color: var(--muted);
+      max-width: 360px; line-height: 1.6;
+    }
 
-    /* ─── DYNAMIC QUESTIONS ─────────────────────────────────────── */
+    /* ─── Q META BAR ─────────────────────────────────────────────── */
     .q-meta-bar {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 16px; background: var(--brand-lt);
-      border: 1px solid rgba(217,119,87,.2); border-radius: 8px;
-      margin-bottom: 24px; font-size: 13px;
+      padding: 12px 18px;
+      background: linear-gradient(135deg, var(--brand-lt), rgba(232,113,74,.04));
+      border: 1px solid var(--brand-border);
+      border-radius: var(--radius-sm);
+      margin-bottom: 28px;
+      font-size: 13px;
     }
-    .q-meta-bar strong { color: var(--brand); }
-    .q-meta-bar span { color: var(--muted); }
+    .q-meta-bar strong { color: var(--brand); font-weight: 800; }
+    .q-meta-bar span { color: var(--muted); font-weight: 500; }
+    .q-meta-tag {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 3px 12px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-2);
+    }
 
+    /* ─── DYNAMIC QUESTIONS ─────────────────────────────────────── */
     .dyn-q {
-      display: flex; gap: 16px; align-items: flex-start;
-      padding: 20px 0; border-bottom: 1px solid var(--border);
-      opacity: 0; animation: fadeUp .35s ease forwards;
+      display: flex; gap: 18px; align-items: flex-start;
+      padding: 22px 0;
+      border-bottom: 1px solid var(--border-light);
+      opacity: 0;
+      animation: fadeUp .4s ease forwards;
     }
     .dyn-q:last-child { border-bottom: none; }
     .dyn-q:nth-child(1)  { animation-delay: .05s; }
-    .dyn-q:nth-child(2)  { animation-delay: .10s; }
-    .dyn-q:nth-child(3)  { animation-delay: .15s; }
-    .dyn-q:nth-child(4)  { animation-delay: .20s; }
-    .dyn-q:nth-child(5)  { animation-delay: .25s; }
-    .dyn-q:nth-child(6)  { animation-delay: .30s; }
-    .dyn-q:nth-child(7)  { animation-delay: .35s; }
-    .dyn-q:nth-child(8)  { animation-delay: .40s; }
+    .dyn-q:nth-child(2)  { animation-delay: .12s; }
+    .dyn-q:nth-child(3)  { animation-delay: .19s; }
+    .dyn-q:nth-child(4)  { animation-delay: .26s; }
+    .dyn-q:nth-child(5)  { animation-delay: .33s; }
+    .dyn-q:nth-child(6)  { animation-delay: .40s; }
+    .dyn-q:nth-child(7)  { animation-delay: .47s; }
+    .dyn-q:nth-child(8)  { animation-delay: .54s; }
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(10px); }
+      from { opacity: 0; transform: translateY(12px); }
       to   { opacity: 1; transform: translateY(0); }
     }
+
     .dyn-q-num {
-      width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
-      background: var(--brand); color: #fff;
+      width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+      color: #fff;
       display: flex; align-items: center; justify-content: center;
-      font-size: 13px; font-weight: 700; margin-top: 1px;
+      font-size: 13px; font-weight: 800; margin-top: 2px;
+      box-shadow: 0 2px 8px rgba(232,113,74,.3);
     }
     .dyn-q-body { flex: 1; }
     .dyn-q-label {
-      display: flex; align-items: center; gap: 8px;
-      font-size: 15px; font-weight: 700; margin-bottom: 4px;
+      display: flex; align-items: center; gap: 9px;
+      font-size: 15px; font-weight: 800;
+      margin-bottom: 5px; letter-spacing: -.2px;
     }
-    .dyn-q-label .icon { font-size: 16px; }
-    .dyn-q-hint { font-size: 13px; color: var(--muted); line-height: 1.55; margin-bottom: 10px; }
+    .dyn-q-label .icon { font-size: 17px; }
+    .dyn-q-hint {
+      font-size: 13px; color: var(--muted);
+      line-height: 1.6; margin-bottom: 12px;
+    }
 
     /* toggle question */
     .toggle-row {
-      display: flex; align-items: center; gap: 10px; cursor: pointer;
-      padding: 10px 14px; border: 1.5px solid var(--border);
-      border-radius: 8px; background: var(--bg);
-      transition: all var(--t); font-size: 14px; font-weight: 500;
+      display: flex; align-items: center; gap: 12px; cursor: pointer;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      transition: all var(--t);
+      font-size: 14px; font-weight: 600;
+      color: var(--text-2);
     }
-    .toggle-row:hover { border-color: var(--brand); background: var(--brand-lt); }
-    .toggle-row.checked { border-color: var(--brand); background: var(--brand-lt); color: var(--brand-dark); }
-    .toggle-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--brand); cursor: pointer; }
-    .toggle-detail { margin-top: 10px; }
+    .toggle-row:hover {
+      border-color: var(--brand-border);
+      background: var(--brand-lt);
+      color: var(--brand);
+    }
+    .toggle-row.checked {
+      border-color: var(--brand);
+      background: var(--brand-lt);
+      color: var(--brand-dark);
+    }
+    .toggle-row input[type="checkbox"] {
+      width: 17px; height: 17px;
+      accent-color: var(--brand); cursor: pointer; flex-shrink: 0;
+    }
+    .toggle-detail { margin-top: 12px; }
 
     /* ─── OUTPUT ───────────────────────────────────────────────── */
+    .output-wrapper {
+      position: relative;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .output-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px;
+      background: var(--bg-2);
+      border-bottom: 1px solid var(--border);
+    }
+    .output-dots { display: flex; gap: 6px; }
+    .output-dots span {
+      width: 11px; height: 11px; border-radius: 50%;
+    }
+    .output-dots span:nth-child(1) { background: #FF5F57; }
+    .output-dots span:nth-child(2) { background: #FFBD2E; }
+    .output-dots span:nth-child(3) { background: #28C840; }
+    .output-filename {
+      font-size: 12px; font-weight: 600;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
     .prompt-output {
-      background: var(--bg); border: 1.5px solid var(--border);
-      border-radius: 8px; padding: 20px;
-      font-family: 'Menlo', 'Consolas', monospace;
-      font-size: 13px; line-height: 1.75; white-space: pre-wrap;
-      word-break: break-word; color: var(--text);
-      max-height: 560px; overflow-y: auto;
+      padding: 22px 24px;
+      font-family: 'JetBrains Mono', 'Menlo', 'Consolas', monospace;
+      font-size: 12.5px; line-height: 1.85;
+      white-space: pre-wrap; word-break: break-word;
+      color: var(--text);
+      max-height: 520px; overflow-y: auto;
     }
+    .prompt-output::-webkit-scrollbar { width: 6px; }
+    .prompt-output::-webkit-scrollbar-track { background: transparent; }
+    .prompt-output::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+    }
+
     .prompt-meta {
-      display: flex; gap: 14px; flex-wrap: wrap;
-      font-size: 12px; color: var(--muted); margin-bottom: 12px;
+      display: flex; gap: 10px; flex-wrap: wrap;
+      font-size: 12px; color: var(--muted);
+      margin-bottom: 16px; align-items: center;
     }
+    .prompt-meta span {
+      display: flex; align-items: center; gap: 5px;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 3px 10px;
+      font-weight: 500;
+    }
+
     .output-toolbar {
       display: flex; gap: 8px; justify-content: flex-end;
-      margin-top: 14px; flex-wrap: wrap;
+      margin-top: 18px; flex-wrap: wrap;
     }
     .copy-success { color: var(--success) !important; }
 
     /* ─── TIPS ─────────────────────────────────────────────────── */
     .tips {
-      background: var(--brand-lt); border: 1px solid rgba(217,119,87,.25);
-      border-radius: var(--radius); padding: 20px 24px; margin-bottom: 20px;
+      background: linear-gradient(135deg, var(--brand-lt), rgba(232,113,74,.04));
+      border: 1px solid var(--brand-border);
+      border-radius: var(--radius);
+      padding: 22px 26px; margin-bottom: 20px;
     }
-    .tips h3 { font-size: 14px; font-weight: 700; color: var(--brand); margin-bottom: 12px; }
-    .tips ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-    .tips li { font-size: 13px; color: var(--muted); display: flex; gap: 8px; line-height: 1.5; }
-    .tips li::before { content: "→"; color: var(--brand); flex-shrink: 0; font-weight: 700; }
+    .tips-header {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 14px;
+    }
+    .tips h3 {
+      font-size: 13.5px; font-weight: 800;
+      color: var(--brand); letter-spacing: -.1px;
+    }
+    .tips ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .tips li {
+      font-size: 13px; color: var(--muted);
+      display: flex; gap: 10px; line-height: 1.6;
+      align-items: flex-start;
+    }
+    .tips li::before {
+      content: "→";
+      color: var(--brand); flex-shrink: 0;
+      font-weight: 800; margin-top: 1px;
+    }
+
+    /* ─── HOW TO USE CARDS ──────────────────────────────────────── */
+    .how-to-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+    }
+    .how-to-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 18px 20px;
+      transition: all var(--t);
+    }
+    .how-to-card:hover {
+      border-color: var(--brand-border);
+      background: var(--brand-lt);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+    .how-to-num {
+      font-size: 26px; margin-bottom: 10px;
+    }
+    .how-to-title {
+      font-size: 13.5px; font-weight: 800;
+      margin-bottom: 5px; letter-spacing: -.2px;
+    }
+    .how-to-desc {
+      font-size: 12.5px; color: var(--muted); line-height: 1.6;
+    }
+    .how-to-desc code {
+      background: var(--border);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+    }
 
     /* ─── MISC ─────────────────────────────────────────────────── */
     .hidden { display: none !important; }
-    .divider { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
-    .toast {
-      position: fixed; bottom: 24px; right: 24px; z-index: 999;
-      background: var(--text); color: var(--bg);
-      padding: 12px 20px; border-radius: 8px;
-      font-size: 14px; font-weight: 500;
-      box-shadow: 0 4px 20px rgba(0,0,0,.2);
-      transform: translateY(80px); opacity: 0;
-      transition: all .3s ease; pointer-events: none;
+    .divider {
+      border: none; border-top: 1px solid var(--border);
+      margin: 30px 0;
     }
-    .toast.show { transform: translateY(0); opacity: 1; }
-    footer { text-align: center; font-size: 13px; color: var(--muted); padding: 20px; border-top: 1px solid var(--border); }
+    .section-heading {
+      font-size: 15px; font-weight: 800;
+      letter-spacing: -.3px; margin-bottom: 16px;
+    }
 
-    @media (max-width: 480px) {
-      .card { padding: 20px; }
-      .hero { padding: 32px 16px 24px; }
-      .step-connector { width: 14px; }
+    /* ─── TOAST ─────────────────────────────────────────────────── */
+    .toast {
+      position: fixed; bottom: 28px; right: 28px; z-index: 999;
+      background: var(--text); color: var(--bg);
+      padding: 13px 22px; border-radius: var(--radius-sm);
+      font-size: 14px; font-weight: 600;
+      box-shadow: 0 8px 30px rgba(0,0,0,.25);
+      transform: translateY(90px) scale(.96); opacity: 0;
+      transition: all .35s cubic-bezier(.34,1.3,.64,1);
+      pointer-events: none;
+      display: flex; align-items: center; gap: 9px;
+    }
+    .toast.show { transform: translateY(0) scale(1); opacity: 1; }
+    .toast-icon { font-size: 16px; }
+
+    /* ─── FOOTER ────────────────────────────────────────────────── */
+    footer {
+      text-align: center; font-size: 13px;
+      color: var(--muted); padding: 24px;
+      border-top: 1px solid var(--border);
+      background: var(--card);
+      font-weight: 500;
+    }
+    footer a { color: var(--brand); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* ─── RESPONSIVE ────────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .card { padding: 22px 20px; }
+      .hero { padding: 40px 20px 28px; }
+      .step-connector { width: 28px; }
+      .hero h1 { letter-spacing: -.8px; }
+      .btn-row { flex-direction: column; align-items: stretch; }
+      .btn-row .btn { justify-content: center; }
+      .output-toolbar { justify-content: stretch; }
+      .output-toolbar .btn { flex: 1; justify-content: center; }
     }
   </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">
+  <a class="logo" href="#">
     <div class="logo-icon">✦</div>
     Prompt <span>Architect</span>
-  </div>
+  </a>
   <div class="header-actions">
-    <button class="icon-btn" id="themeToggle" title="Toggle dark mode">🌙</button>
-    <button class="icon-btn" onclick="resetAll()" title="Start over">↺</button>
+    <button class="icon-btn" id="themeToggle" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
+    <button class="icon-btn" onclick="resetAll()" title="Start over" aria-label="Start over">↺</button>
   </div>
 </header>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast"><span class="toast-icon">✓</span><span id="toastMsg"></span></div>
 
 <!-- HERO -->
 <div class="hero">
-  <div class="badge">✦ Free · No Signup · 60 Seconds</div>
-  <h1>Stop guessing. Build prompts that<br><em>actually work.</em></h1>
-  <p>Most AI prompts fail because they're vague. Describe your use case, answer a few smart questions, and get a structured, Claude-optimized prompt — ready to paste in under a minute.</p>
+  <div class="badge"><div class="badge-dot"></div> Smart Question Engine</div>
+  <h1>Turn any rough idea into a<br><em>production-ready prompt</em></h1>
+  <p>Describe what you want your AI to do — we'll figure out exactly which questions matter and generate a perfectly structured, Claude-optimized prompt.</p>
+
   <div class="steps-overview">
-    <div class="step-pip active" id="pip1"><div class="num">1</div> Your Idea</div>
-    <div class="step-connector"></div>
-    <div class="step-pip" id="pip2"><div class="num">2</div> Smart Questions</div>
-    <div class="step-connector"></div>
-    <div class="step-pip" id="pip3"><div class="num">3</div> Your Prompt</div>
-  </div>
-  <div class="value-strip">
-    <span>Free, no account needed</span>
-    <span>Claude-optimized structure</span>
-    <span>Reusable with placeholders</span>
+    <div class="step-pip active" id="pip1">
+      <div class="num">1</div>
+      <span>Your Idea</span>
+    </div>
+    <div class="step-connector" id="conn1"></div>
+    <div class="step-pip" id="pip2">
+      <div class="num">2</div>
+      <span>Questions</span>
+    </div>
+    <div class="step-connector" id="conn2"></div>
+    <div class="step-pip" id="pip3">
+      <div class="num">3</div>
+      <span>Your Prompt</span>
+    </div>
   </div>
 </div>
 
@@ -324,12 +737,15 @@
 
   <!-- TIPS -->
   <div class="tips" id="tipsPanel">
-    <h3>💡 Why teams use Prompt Architect</h3>
+    <div class="tips-header">
+      <span style="font-size:18px;">💡</span>
+      <h3>Why structured prompts matter</h3>
+    </div>
     <ul>
-      <li>Get consistent, on-brand AI responses — stop re-explaining context every time.</li>
-      <li>Only the questions relevant to your use case are shown — no wasted effort.</li>
-      <li><code>{{PLACEHOLDERS}}</code> make your prompt reusable — build once, deploy everywhere.</li>
-      <li>Built-in chain-of-thought structure means fewer errors and better reasoning out of the box.</li>
+      <li>Clearer context = fewer back-and-forth messages — fewer tokens, lower cost.</li>
+      <li>Only the questions <em>relevant to your task</em> are shown — no noise.</li>
+      <li><code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--brand-lt);padding:1px 5px;border-radius:3px;color:var(--brand);">{{PLACEHOLDERS}}</code> make your prompt reusable across any input.</li>
+      <li>Chain-of-thought instructions ("think step by step") reduce reasoning errors.</li>
     </ul>
   </div>
 
@@ -338,31 +754,33 @@
     <div class="card-header">
       <div class="card-icon">💡</div>
       <div>
-        <div class="card-title">What do you want your AI to do?</div>
-        <div class="card-sub">The more specific you are, the more targeted your prompt will be. Start with a template or write your own.</div>
+        <div class="card-title">Step 1 — Describe your idea</div>
+        <div class="card-sub">Tell us what you want your AI to do. The more detail, the smarter the questions.</div>
       </div>
     </div>
 
-    <div style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:8px;">⚡ Quick start — pick a template:</div>
+    <div class="template-label">Quick-start templates</div>
     <div class="template-row">
-      <div class="chip" onclick="loadTemplate('career',event)">Career Coach</div>
-      <div class="chip" onclick="loadTemplate('support',event)">Customer Support</div>
-      <div class="chip" onclick="loadTemplate('writer',event)">Content Writer</div>
-      <div class="chip" onclick="loadTemplate('tutor',event)">Study Tutor</div>
-      <div class="chip" onclick="loadTemplate('sales',event)">Sales Assistant</div>
-      <div class="chip" onclick="loadTemplate('code',event)">Code Reviewer</div>
+      <div class="chip" onclick="loadTemplate('career',event)">🎯 Career Coach</div>
+      <div class="chip" onclick="loadTemplate('support',event)">💬 Customer Support</div>
+      <div class="chip" onclick="loadTemplate('writer',event)">✍️ Content Writer</div>
+      <div class="chip" onclick="loadTemplate('tutor',event)">📚 Study Tutor</div>
+      <div class="chip" onclick="loadTemplate('sales',event)">📈 Sales Assistant</div>
+      <div class="chip" onclick="loadTemplate('code',event)">💻 Code Reviewer</div>
     </div>
 
     <div class="field">
-      <label>Describe your use case
-        <span class="tip">Include the task, who it's for, the context, and any must-haves. More detail = smarter questions = better prompt.</span>
+      <label>What should your AI do?
+        <span class="tip">Be as specific as possible — describe the task, the users, the context, and any special requirements.</span>
       </label>
-      <textarea id="ideaInput" placeholder="Example: I want an AI that helps our customer support team handle billing questions and refund requests for a subscription SaaS product. It should follow our refund policy and escalate complex cases to human agents..." oninput="onIdeaInput()" style="min-height:140px;"></textarea>
+      <textarea id="ideaInput" placeholder="Example: I want an AI that helps our customer support team handle billing questions and refund requests for a subscription SaaS product. It should follow our refund policy and escalate complex cases to human agents..." oninput="onIdeaInput()" style="min-height:150px;"></textarea>
       <div class="char-count" id="ideaCount">0 / 5000</div>
     </div>
 
     <div class="btn-row">
-      <button class="btn btn-primary" onclick="goToStep2()" id="step1Btn">Build My Prompt →</button>
+      <button class="btn btn-primary" onclick="goToStep2()" id="step1Btn">
+        <span>✦</span> Analyse &amp; Get Questions
+      </button>
     </div>
   </div>
 
@@ -378,23 +796,25 @@
 
     <!-- Analyzing state -->
     <div class="analyzing-state" id="analyzingState">
-      <div class="spinner"></div>
-      <h3>Tailoring your questions…</h3>
-      <p>We're picking only the questions that will meaningfully improve your prompt — no fluff.</p>
+      <div class="spinner-wrap">
+        <div class="spinner"></div>
+      </div>
+      <h3>Analysing your idea…</h3>
+      <p>Figuring out which questions will actually improve your prompt.</p>
     </div>
 
     <!-- Questions container -->
     <div class="hidden" id="questionsWrap">
       <div class="q-meta-bar" id="qMetaBar">
         <span><strong id="qCount">0</strong> targeted questions</span>
-        <span id="qContextTag"></span>
+        <span class="q-meta-tag" id="qContextTag"></span>
       </div>
       <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
       <div class="progress-label" id="progressLabel">Fill in what you know — skip anything that doesn't apply.</div>
       <div id="dynamicQuestions"></div>
       <hr class="divider" />
       <div class="btn-row">
-        <button class="btn btn-primary" onclick="generatePrompt()">✦ Get My Prompt</button>
+        <button class="btn btn-primary" onclick="generatePrompt()">✦ Generate My Prompt</button>
         <button class="btn btn-secondary" onclick="showStep(1)">← Back</button>
       </div>
     </div>
@@ -405,76 +825,84 @@
     <div class="card-header">
       <div class="card-icon">✦</div>
       <div>
-        <div class="card-title">Your Prompt Is Ready</div>
-        <div class="card-sub">Structured, Claude-optimized, and ready to use. Copy it in seconds — or download it for later.</div>
+        <div class="card-title">Your Structured Prompt</div>
+        <div class="card-sub">Copy and paste directly into Claude's system prompt field.</div>
       </div>
     </div>
+
     <div class="prompt-meta" id="promptMeta"></div>
-    <div class="prompt-output" id="promptOutput"></div>
+
+    <div class="output-wrapper">
+      <div class="output-header">
+        <div class="output-dots">
+          <span></span><span></span><span></span>
+        </div>
+        <span class="output-filename">system_prompt.txt</span>
+        <span style="font-size:12px;color:var(--muted);font-weight:500;">Generated by Prompt Architect</span>
+      </div>
+      <div class="prompt-output" id="promptOutput"></div>
+    </div>
+
     <div class="output-toolbar">
       <button class="btn btn-secondary" id="copyBtn" onclick="copyPrompt()">📋 Copy Prompt</button>
       <button class="btn btn-secondary" onclick="downloadPrompt()">⬇ Download .txt</button>
       <button class="btn btn-ghost" onclick="showStep(2)">← Edit Answers</button>
-      <button class="btn btn-primary" onclick="resetAll()">+ Build Another Prompt</button>
+      <button class="btn btn-primary" onclick="resetAll()">+ New Prompt</button>
     </div>
+
     <hr class="divider" />
-    <h3 style="font-size:15px;font-weight:700;margin-bottom:14px;">3 ways to put this to work right now</h3>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;">
-      <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;">
-        <div style="font-size:22px;margin-bottom:8px;">1️⃣</div>
-        <div style="font-size:14px;font-weight:600;margin-bottom:4px;">In Claude.ai</div>
-        <div style="font-size:13px;color:var(--muted);line-height:1.5;">Open a new Project → paste into the System Prompt field. Done in seconds.</div>
+
+    <div class="section-heading">How to use this prompt</div>
+    <div class="how-to-grid">
+      <div class="how-to-card">
+        <div class="how-to-num">1️⃣</div>
+        <div class="how-to-title">In Claude.ai</div>
+        <div class="how-to-desc">Open a new Project → paste into the System Prompt field.</div>
       </div>
-      <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;">
-        <div style="font-size:22px;margin-bottom:8px;">2️⃣</div>
-        <div style="font-size:14px;font-weight:600;margin-bottom:4px;">Via the API</div>
-        <div style="font-size:13px;color:var(--muted);line-height:1.5;">Drop it into the <code style="background:var(--border);padding:1px 5px;border-radius:3px;">system</code> parameter — your AI is instantly context-aware.</div>
+      <div class="how-to-card">
+        <div class="how-to-num">2️⃣</div>
+        <div class="how-to-title">Via API</div>
+        <div class="how-to-desc">Use as the <code>system</code> parameter in your API call.</div>
       </div>
-      <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;">
-        <div style="font-size:22px;margin-bottom:8px;">3️⃣</div>
-        <div style="font-size:14px;font-weight:600;margin-bottom:4px;">Make It Reusable</div>
-        <div style="font-size:13px;color:var(--muted);line-height:1.5;">Swap <code style="background:var(--border);padding:1px 5px;border-radius:3px;">{{DOCUMENT}}</code>, <code style="background:var(--border);padding:1px 5px;border-radius:3px;">{{HISTORY}}</code>, <code style="background:var(--border);padding:1px 5px;border-radius:3px;">{{QUESTION}}</code> at runtime — one prompt, infinite uses.</div>
+      <div class="how-to-card">
+        <div class="how-to-num">3️⃣</div>
+        <div class="how-to-title">Fill Placeholders</div>
+        <div class="how-to-desc">Replace <code>{{DOCUMENT}}</code>, <code>{{HISTORY}}</code>, <code>{{QUESTION}}</code> at runtime.</div>
       </div>
     </div>
   </div>
 
 </div><!-- /container -->
-<footer>Prompt Architect &nbsp;·&nbsp; Better prompts. Better results. &nbsp;·&nbsp; Built for Claude &nbsp;·&nbsp; Free forever</footer>
+
+<footer>
+  Prompt Architect &nbsp;·&nbsp; Optimized for Claude &nbsp;·&nbsp; v2.1
+</footer>
 
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   QUESTION POOL — scored against the user's idea text.
-   Only relevant ones are shown.
+   QUESTION POOL
 ═══════════════════════════════════════════════════════════════ */
 const Q_POOL = [
   {
-    id: 'persona',
-    icon: '🎭',
-    label: 'AI Persona & Role',
+    id: 'persona', icon: '🎭', label: 'AI Persona & Role',
     question: 'What persona or role should this AI take on?',
     hint: 'A named character with a company and job title makes responses far more consistent and on-brand.',
-    type: 'text',
-    placeholder: 'e.g. Alex, Support Specialist at TechCorp',
+    type: 'text', placeholder: 'e.g. Alex, Support Specialist at TechCorp',
     keywords: ['chatbot','assistant','agent','coach','advisor','support','tutor','guide','character','bot','customer service','concierge','mentor','consultant','respond','answer user','talk to','speak to','help users','help customers','chat with','persona'],
     anti: ['write code','script','function','pipeline','automat','batch process','parse','extract data','convert','classify','data analysis','sql','api endpoint'],
     base: 0
   },
   {
-    id: 'audience',
-    icon: '👥',
-    label: 'Target Audience',
+    id: 'audience', icon: '👥', label: 'Target Audience',
     question: 'Who will be reading or receiving these responses?',
     hint: 'Their background, technical level, and expectations shape vocabulary, depth, and tone.',
-    type: 'text',
-    placeholder: 'e.g. Non-technical customers, or junior marketing managers at B2B companies',
+    type: 'text', placeholder: 'e.g. Non-technical customers, or junior marketing managers at B2B companies',
     keywords: ['write','content','article','blog','post','email','newsletter','marketing','reader','customer','client','users','public','student','employee','beginner','senior','person','people','audience','team','prospect','subscriber','member'],
     anti: ['internal pipeline','api call','code function','data processing','batch','sql'],
     base: 0
   },
   {
-    id: 'tone',
-    icon: '🗣️',
-    label: 'Tone & Communication Style',
+    id: 'tone', icon: '🗣️', label: 'Tone & Communication Style',
     question: 'What tone and communication style should it use?',
     hint: 'Only ask this when the AI speaks to humans — skip for automated/internal workflows.',
     type: 'select',
@@ -484,58 +912,42 @@ const Q_POOL = [
     base: 0
   },
   {
-    id: 'document',
-    icon: '📎',
-    label: 'Reference Documents or Data',
+    id: 'document', icon: '📎', label: 'Reference Documents or Data',
     question: 'Should the AI reference specific documents, data, or a knowledge base?',
     hint: 'e.g. product manual, FAQ, pricing table, policy doc — we\'ll add a {{DOCUMENT}} placeholder.',
     type: 'toggle_text',
     toggleLabel: 'Yes — it needs to reference specific documents or data',
     placeholder: 'Describe the document type (e.g. refund policy PDF, product catalogue, pricing tiers)',
     keywords: ['document','knowledge base','faq','manual','guide','policy','procedure','catalogue','inventory','pricing','database','reference','spec','information','lookup','product info','knowledge','article','wiki','pdf','content library'],
-    anti: [],
-    base: 1
+    anti: [], base: 1
   },
   {
-    id: 'domain',
-    icon: '🔬',
-    label: 'Domain & Expertise',
+    id: 'domain', icon: '🔬', label: 'Domain & Expertise',
     question: 'What specialised domain knowledge should it draw on?',
     hint: 'This tells Claude how deep to go and what terminology to use.',
-    type: 'text',
-    placeholder: 'e.g. B2B SaaS sales, corporate law, clinical nutrition, e-commerce operations',
+    type: 'text', placeholder: 'e.g. B2B SaaS sales, corporate law, clinical nutrition, e-commerce operations',
     keywords: ['legal','medical','financial','technical','scientific','engineering','healthcare','compliance','regulatory','tax','accounting','clinical','pharmaceutical','cybersecurity','architecture','specialized','expert','professional','industry','domain','niche','sector'],
-    anti: [],
-    base: 0
+    anti: [], base: 0
   },
   {
-    id: 'constraints',
-    icon: '🚧',
-    label: 'Key Rules & Constraints',
+    id: 'constraints', icon: '🚧', label: 'Key Rules & Constraints',
     question: 'Are there hard rules, limits, or things it must never do?',
-    hint: 'Hard rules Claude must always follow — brand guidelines, compliance limits, required disclaimers, things it must never say. One rule per line.',
+    hint: 'Brand guidelines, compliance rules, restricted topics, required disclaimers. One per line.',
     type: 'textarea',
     placeholder: 'Never discuss competitor pricing\nAlways add a legal disclaimer for financial advice\nOnly respond in formal English\nEscalate unresolved billing issues to billing@company.com',
     keywords: ['rule','constraint','limit','must','never','always','policy','compliance','brand','guideline','restrict','avoid','prohibit','require','legal','privacy','confidential','safety','regulated','restricted','boundary','limit'],
-    anti: [],
-    base: 2
+    anti: [], base: 2
   },
   {
-    id: 'format',
-    icon: '📋',
-    label: 'Output Format',
+    id: 'format', icon: '📋', label: 'Output Format',
     question: 'How should the AI format its responses?',
     hint: 'Affects readability and how the output is used downstream.',
     type: 'select',
     options: ['Plain paragraphs (conversational)','Bullet points / lists','Numbered steps','Markdown (headers, bold, code blocks)','JSON object','XML tags','Response wrapped in <response> tags','Tables','Short & direct (1-2 sentences)'],
-    keywords: [],
-    anti: [],
-    base: 10  /* always show */
+    keywords: [], anti: [], base: 10
   },
   {
-    id: 'length',
-    icon: '📏',
-    label: 'Response Length & Depth',
+    id: 'length', icon: '📏', label: 'Response Length & Depth',
     question: 'How long or detailed should responses typically be?',
     hint: 'Calibrates verbosity — prevents both too-short and overwhelming answers.',
     type: 'select',
@@ -545,52 +957,21 @@ const Q_POOL = [
     base: 0
   },
   {
-    id: 'escalation',
-    icon: '🆘',
-    label: 'Fallback & Escalation',
+    id: 'escalation', icon: '🆘', label: 'Fallback & Escalation',
     question: 'What should happen when the AI can\'t answer or is uncertain?',
     hint: 'e.g. redirect to a human agent, say "I don\'t know", link to a help page.',
-    type: 'text',
-    placeholder: 'e.g. Say "I\'m not sure — please email support@company.com for help"',
+    type: 'text', placeholder: 'e.g. Say "I\'m not sure — please email support@company.com for help"',
     keywords: ['support','customer service','chatbot','agent','helpdesk','escalate','fallback','redirect','human agent','live chat','ticket','handoff','transfer','cannot answer','doesn\'t know','uncertain','out of scope'],
     anti: ['writer','content creator','code','data analysis','internal','pipeline'],
     base: 0
   },
   {
-    id: 'language',
-    icon: '🌐',
-    label: 'Language',
+    id: 'language', icon: '🌐', label: 'Language',
     question: 'What language(s) should the AI respond in?',
     hint: 'Specify if multilingual support or a specific language is required.',
-    type: 'text',
-    placeholder: 'e.g. English only, or automatically match the user\'s language',
+    type: 'text', placeholder: 'e.g. English only, or automatically match the user\'s language',
     keywords: ['language','multilingual','international','global','translate','spanish','french','hindi','arabic','chinese','japanese','localize','regional','bilingual','non-english','multiple language'],
-    anti: [],
-    base: 0
-  },
-  {
-    id: 'example_io',
-    icon: '✨',
-    label: 'Ideal Example (Few-Shot)',
-    question: 'Show us a perfect exchange — a sample input and the ideal response.',
-    hint: 'This is the single highest-impact addition. Claude learns from examples far better than instructions alone. Even one example dramatically improves output quality and consistency.',
-    type: 'textarea',
-    placeholder: 'User: "I was charged twice last month and I need a refund."\n\nIdeal response: "I\'m really sorry about that — I can see the duplicate charge on your account. I\'ve processed a full refund right now, and you\'ll see it within 3–5 business days. Is there anything else I can help you with?"',
-    keywords: ['chatbot','assistant','support','agent','coach','advisor','tutor','guide','writer','content','email','sales','customer','respond','help users','answer'],
-    anti: ['pipeline','batch','sql','data analysis','extract data','convert','classify'],
-    base: 3
-  },
-  {
-    id: 'failure_modes',
-    icon: '⚠️',
-    label: 'Failure Modes to Avoid',
-    question: 'What are the most common ways this AI might go wrong?',
-    hint: 'Naming failure modes explicitly makes Claude far less likely to commit them. Think about past AI mistakes or things you definitely want to prevent.',
-    type: 'textarea',
-    placeholder: 'Giving vague, non-committal answers when the user needs a clear decision\nPromising outcomes (like a refund) without verifying eligibility first\nUsing technical jargon with non-technical users\nApologising excessively instead of just solving the problem',
-    keywords: ['chatbot','support','agent','assistant','coach','advisor','tutor','sales','writer','content','customer','help users','answer','respond'],
-    anti: ['pipeline','batch','sql','data analysis'],
-    base: 2
+    anti: [], base: 0
   }
 ];
 
@@ -604,26 +985,15 @@ function scoreQ(q, idea) {
 }
 
 function getRelevantQuestions(idea) {
-  const MIN = 2;
-  const MAX = 10;
-  const scored = Q_POOL
-    .map(q => ({ ...q, score: scoreQ(q, idea) }))
-    .filter(q => q.score >= MIN);
-
-  // format always included; example_io + failure_modes prioritised high; sort rest by score desc
-  const fmt     = scored.find(q => q.id === 'format');
-  const example = scored.find(q => q.id === 'example_io');
-  const failure = scored.find(q => q.id === 'failure_modes');
-  const pinned  = [example, failure].filter(Boolean);
-  const rest    = scored
-    .filter(q => !['format','example_io','failure_modes'].includes(q.id))
-    .sort((a,b) => b.score - a.score);
-  const picked  = [...rest.slice(0, MAX - pinned.length - 1), ...pinned];
+  const MIN = 2, MAX = 8;
+  const scored = Q_POOL.map(q => ({ ...q, score: scoreQ(q, idea) })).filter(q => q.score >= MIN);
+  const fmt  = scored.find(q => q.id === 'format');
+  const rest = scored.filter(q => q.id !== 'format').sort((a,b) => b.score - a.score);
+  const picked = rest.slice(0, MAX - 1);
   if (fmt) picked.push(fmt);
   return picked;
 }
 
-/* ─── DETECT CONTEXT LABEL ──────────────────────────────────── */
 function detectContext(idea) {
   const t = idea.toLowerCase();
   if (/chatbot|support agent|customer service|helpdesk|live chat/.test(t)) return '💬 Conversational Agent';
@@ -640,7 +1010,6 @@ function detectContext(idea) {
 function renderQuestions(questions, idea) {
   const container = document.getElementById('dynamicQuestions');
   container.innerHTML = '';
-
   const ctx = detectContext(idea);
   document.getElementById('qCount').textContent = questions.length;
   document.getElementById('qContextTag').textContent = ctx;
@@ -659,9 +1028,7 @@ function renderQuestions(questions, idea) {
       inputHTML = `<textarea id="dq_${q.id}" class="dyn-input" placeholder="${q.placeholder || ''}" rows="4" oninput="updateProgress()"></textarea>`;
     } else if (q.type === 'select') {
       const opts = q.options.map(o => `<option value="${escHtml(o)}">${escHtml(o)}</option>`).join('');
-      inputHTML = `<select id="dq_${q.id}" class="dyn-input" onchange="updateProgress()">
-        <option value="">— Select —</option>${opts}
-      </select>`;
+      inputHTML = `<select id="dq_${q.id}" class="dyn-input" onchange="updateProgress()"><option value="">— Select —</option>${opts}</select>`;
     } else if (q.type === 'toggle_text') {
       inputHTML = `
         <label class="toggle-row" id="dq_${q.id}_row" onclick="toggleDetail('${q.id}',this)">
@@ -686,7 +1053,6 @@ function renderQuestions(questions, idea) {
   updateProgress();
 }
 
-/* ─── TOGGLE DETAIL ─────────────────────────────────────────── */
 function toggleDetail(qid, rowEl) {
   const chk    = document.getElementById(`dq_${qid}_chk`);
   const detail = document.getElementById(`dq_${qid}_detail`);
@@ -697,26 +1063,22 @@ function toggleDetail(qid, rowEl) {
   updateProgress();
 }
 
-/* ─── PROGRESS ──────────────────────────────────────────────── */
 function updateProgress() {
-  const inputs  = document.querySelectorAll('.dyn-input');
-  const checks  = document.querySelectorAll('.dyn-q [type="checkbox"]');
+  const inputs = document.querySelectorAll('.dyn-input');
+  const checks = document.querySelectorAll('.dyn-q [type="checkbox"]');
   let filled = 0, total = 0;
   inputs.forEach(el => {
-    if (el.closest('.hidden')) return; // skip hidden details
+    if (el.closest('.hidden')) return;
     total++;
     if (el.value.trim()) filled++;
   });
-  checks.forEach(el => {
-    total++;
-    if (el.checked) filled++;
-  });
+  checks.forEach(el => { total++; if (el.checked) filled++; });
   const pct = total ? Math.round((filled / total) * 100) : 0;
   document.getElementById('progressFill').style.width = pct + '%';
   document.getElementById('progressLabel').textContent =
-    pct === 100 ? '✓ Perfect — your prompt will be highly tailored. Hit the button!' :
-    pct > 50    ? `${pct}% done — great progress! Fill in more or generate now.` :
-                  'Answer what you can — skip anything that doesn\'t apply.';
+    pct === 100 ? '✓ All filled — ready to generate!' :
+    pct > 50    ? `${pct}% filled — keep going or generate now.` :
+                  'Fill in what you know — skip anything that doesn\'t apply.';
 }
 
 /* ─── STEP NAV ──────────────────────────────────────────────── */
@@ -725,12 +1087,19 @@ function showStep(n) {
   document.getElementById('step2Card').classList.toggle('hidden', n !== 2);
   document.getElementById('step3Card').classList.toggle('hidden', n !== 3);
   document.getElementById('tipsPanel').classList.toggle('hidden', n === 3);
+
   ['pip1','pip2','pip3'].forEach((id, i) => {
     const el = document.getElementById(id);
     el.classList.remove('active','done');
     if (i + 1 <  n) el.classList.add('done');
     if (i + 1 === n) el.classList.add('active');
   });
+  // connectors
+  ['conn1','conn2'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('done', n > i + 1);
+  });
+
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -745,16 +1114,13 @@ function goToStep2() {
   setTimeout(() => {
     const questions = getRelevantQuestions(idea);
     renderQuestions(questions, idea);
-
-    // Apply any pending template answers
     if (window._templateAnswers) {
       applyTemplateAnswers(window._templateAnswers, questions);
       window._templateAnswers = null;
     }
-
     document.getElementById('analyzingState').classList.add('hidden');
     document.getElementById('questionsWrap').classList.remove('hidden');
-  }, 700);
+  }, 750);
 }
 
 /* ─── COLLECT ANSWERS ───────────────────────────────────────── */
@@ -762,11 +1128,9 @@ function collectAnswers() {
   const ans = {};
   document.querySelectorAll('.dyn-q').forEach(wrap => {
     const qid   = wrap.dataset.qid;
-    const input = wrap.querySelector(`.dyn-input`);
-    const chk   = wrap.querySelector(`[type="checkbox"]`);
-
+    const input = wrap.querySelector('.dyn-input');
+    const chk   = wrap.querySelector('[type="checkbox"]');
     if (chk) {
-      // toggle_text type
       ans[qid] = chk.checked ? (input ? input.value.trim() : 'yes') : '';
     } else if (input) {
       ans[qid] = input.value.trim();
@@ -775,129 +1139,64 @@ function collectAnswers() {
   return ans;
 }
 
-/* ─── GENERATE PROMPT ────────────────────────────────────────── */
+/* ─── GENERATE PROMPT ───────────────────────────────────────── */
 function generatePrompt() {
   const idea = document.getElementById('ideaInput').value.trim();
   const ans  = collectAnswers();
-  const ctx  = detectContext(idea);
-
-  const persona      = ans.persona      || '';
-  const audience     = ans.audience     || '';
-  const tone         = ans.tone         || '';
-  const useDoc       = !!ans.document;
-  const docLabel     = ans.document     || 'reference document';
-  const domain       = ans.domain       || '';
-  const rules        = ans.constraints  || '';
-  const format       = ans.format       || '';
-  const length       = ans.length       || '';
-  const escalation   = ans.escalation   || '';
-  const language     = ans.language     || '';
-  const exampleIO    = ans.example_io   || '';
-  const failureModes = ans.failure_modes || '';
-
-  /* Detect context type for context-aware sections */
-  const isAgent   = /Conversational|Support|Sales|Education|Coaching/i.test(ctx);
-  const isWriter  = /Content|Writing/i.test(ctx);
-  const isDev     = /Developer/i.test(ctx);
-  const isData    = /Data|Automation/i.test(ctx);
-
+  const { persona='', audience='', tone='', document:useDocRaw='', domain='',
+          constraints:rules='', format='', length='', escalation='', language='' } = ans;
+  const useDoc   = !!useDocRaw;
+  const docLabel = useDocRaw || 'reference document';
+  const personaName = persona ? persona.split(',')[0].trim() : 'AI Assistant';
   const parts = [];
 
-  /* ── <role_and_goal> ── */
-  let roleLines = '';
-  roleLines += persona ? `You are ${persona}.\n` : `You are a helpful AI assistant.\n`;
-  roleLines += `Your job: ${idea}\n`;
-  if (audience) roleLines += `You are responding to: ${audience}.\n`;
-  if (domain)   roleLines += `You draw on deep expertise in: ${domain}.\n`;
-  if (language) roleLines += `Always respond in: ${language}.\n`;
-  parts.push(`<role_and_goal>\n${roleLines.trim()}\n</role_and_goal>`);
+  let ctx = `[Task Context]\n`;
+  ctx += persona ? `You will act as ${persona}.\n` : `You are a helpful AI assistant.\n`;
+  ctx += `Your primary goal: ${idea}.\n`;
+  if (audience)  ctx += `You are responding to: ${audience}.\n`;
+  if (domain)    ctx += `You draw on expertise in: ${domain}.\n`;
+  parts.push(ctx.trim());
 
-  /* ── <tone> ── */
-  if (tone) {
-    parts.push(`<tone>\nMaintain a ${tone.toLowerCase()} in every interaction — regardless of how simple or complex the request is. Your tone is part of your identity, not just a style choice.\n</tone>`);
-  }
+  if (tone) parts.push(`[Tone]\nMaintain a ${tone.toLowerCase()} throughout every interaction. This should be consistent regardless of the topic or complexity of the request.`);
+  if (language) parts.push(`[Language]\n${language}.`);
 
-  /* ── <knowledge_base> ── */
-  if (useDoc) {
-    parts.push(`<knowledge_base>\nAlways consult the following ${docLabel} before responding. Prioritise it over your general knowledge.\n<document>\n{{DOCUMENT}}\n</document>\nIf the document does not cover the user's question, say so explicitly — do not infer or fabricate an answer.\n</knowledge_base>`);
-  }
+  if (useDoc) parts.push(`[Data / Docs]\nHere is the ${docLabel} you must consult when formulating responses:\n<guide>\n{{DOCUMENT}}\n</guide>\nAlways prioritise this document over your general knowledge. If the document doesn't cover a question, say so clearly.`);
 
-  /* ── <examples> (few-shot) ── */
-  if (exampleIO) {
-    parts.push(`<examples>\nHere is an example of an ideal interaction. Use this as your quality bar — match the style, depth, and tone in your own responses.\n\n${exampleIO.trim()}\n</examples>`);
-  }
+  const baseRules = [
+    `- If you are unsure how to respond, say: "I'm not sure about that — could you clarify what you need?"`,
+    `- If a question is outside your scope, politely redirect the user back to your area of focus.`
+  ];
+  if (escalation) baseRules.push(`- ${escalation}`);
+  const userRules = rules ? rules.split('\n').filter(r => r.trim()).map(r => `- ${r.trim()}`) : [];
+  parts.push(`[Rules]\nHere are the important rules for every interaction:\n${[...userRules, ...baseRules].join('\n')}`);
 
-  /* ── <rules> ── */
-  const userRules = rules
-    ? rules.split('\n').filter(r => r.trim()).map(r => `- ${r.replace(/^-\s*/,'').trim()}`)
-    : [];
-  if (escalation) userRules.push(`- ${escalation.replace(/^-\s*/,'')}`);
-  /* Only add agent-specific fallback rules for conversational/support contexts */
-  if (isAgent && !isDev && !isData) {
-    userRules.push(`- If you are genuinely uncertain, say so clearly and offer a next step rather than guessing.`);
-    userRules.push(`- If a request is outside your scope, acknowledge it and redirect the user helpfully.`);
-  }
-  if (userRules.length) {
-    parts.push(`<rules>\n${userRules.join('\n')}\n</rules>`);
-  }
+  parts.push(`[History]\nConversation history (may be empty on first message):\n<history>\n{{HISTORY}}\n</history>\n\nUser's current message:\n<question>\n{{QUESTION}}\n</question>`);
+  parts.push(`[Immediate Request]\nHow do you respond to the user's message as ${personaName}?`);
+  parts.push(`[Think step by step]\nBefore replying, think through: the user's actual need, the relevant rules, and the best way to help. Then respond.`);
 
-  /* ── <avoid> (failure modes) ── */
-  if (failureModes) {
-    const failLines = failureModes.split('\n').filter(f => f.trim())
-      .map(f => `- ${f.replace(/^-\s*/,'').trim()}`).join('\n');
-    parts.push(`<avoid>\nThese are known failure modes — actively avoid them in every response:\n${failLines}\n</avoid>`);
-  }
-
-  /* ── Input placeholders — context-aware ── */
-  if (isDev) {
-    parts.push(`<code_to_review>\n{{CODE}}\n</code_to_review>\n\n<request>\n{{QUESTION}}\n</request>`);
-  } else if (isData && !isAgent) {
-    parts.push(`<input_data>\n{{INPUT}}\n</input_data>\n\n<task>\n{{TASK}}\n</task>`);
-  } else if (isWriter && !isAgent) {
-    parts.push(`<brief>\n{{BRIEF}}\n</brief>`);
-  } else {
-    /* Default: conversational agent */
-    parts.push(`<conversation_history>\nPrior messages (empty on first turn):\n{{HISTORY}}\n</conversation_history>\n\n<user_message>\n{{QUESTION}}\n</user_message>`);
-  }
-
-  /* ── <thinking> — context-specific CoT ── */
-  let thinkLines = '';
-  if (isDev) {
-    thinkLines = `Before responding, work through:\n1. What is the code actually doing, and what is the author's intent?\n2. Are there security vulnerabilities, performance issues, or correctness bugs?\n3. What is the clearest, most actionable way to explain each finding?\n4. Is the suggested fix idiomatic, minimal, and safe?`;
-  } else if (isWriter) {
-    thinkLines = `Before writing, think through:\n1. What is the core message or goal of this piece?\n2. Who is the reader and what do they care about most?\n3. What structure, length, and format will serve them best?\n4. Does the draft match the required tone and brand voice?`;
-  } else if (isData) {
-    thinkLines = `Before responding, reason through:\n1. What is the precise task or transformation required?\n2. Are there edge cases or data quality issues to handle?\n3. What is the clearest and most efficient approach?\n4. Does the output format match what's expected downstream?`;
-  } else {
-    thinkLines = `Before responding, work through:\n1. What does the user actually need — not just what they literally said?\n2. Which rules or constraints apply to this specific situation?\n3. Have I checked the knowledge base (if provided) before answering from memory?\n4. What is the most helpful, accurate, and on-brand response I can give?`;
-  }
-  parts.push(`<thinking>\n${thinkLines}\n</thinking>`);
-
-  /* ── <output_format> ── */
-  let fmtLines = '';
+  let fmtBlock = '[Format]\n';
   if (format === 'Response wrapped in <response> tags' || format === 'XML tags') {
-    fmtLines = `Wrap your final answer in <response></response> tags.`;
+    fmtBlock += 'Wrap your response in <response></response> tags.';
   } else if (format) {
-    fmtLines = `Format your response as: ${format}.`;
+    fmtBlock += `Format: ${format}.`;
   } else {
-    fmtLines = `Wrap your final answer in <response></response> tags.`;
+    fmtBlock += 'Wrap your response in <response></response> tags.';
   }
-  if (length) fmtLines += `\nTarget length: ${length}.`;
-  parts.push(`<output_format>\n${fmtLines}\n</output_format>`);
+  if (length) fmtBlock += `\nLength: ${length}.`;
+  parts.push(fmtBlock);
 
-  const fullPrompt = parts.join('\n\n');
+  const fullPrompt = parts.join('\n\n---\n\n');
   const prefill    = (format === 'Response wrapped in <response> tags')
-    ? '\n\n---\n\nAssistant (prefill):\n<response>'
-    : '';
+    ? '\n\n---\n\nAssistant (prefill):\n<response>' : '';
   const final = fullPrompt + prefill;
+  const tokens = Math.round(final.length / 4);
+  const docFlag = useDoc ? '<span>📎 {{DOCUMENT}}</span>' : '';
 
-  /* meta */
-  const tokens  = Math.round(final.length / 4);
-  const docFlag = useDoc ? ' · <span>📎 {{DOCUMENT}}</span>' : '';
-  const exFlag  = exampleIO ? ' · <span>✨ few-shot</span>' : '';
-  document.getElementById('promptMeta').innerHTML =
-    `<span>📐 ~${tokens} tokens</span><span>📝 ${parts.length} sections</span>${docFlag}${exFlag}`;
-
+  document.getElementById('promptMeta').innerHTML = `
+    <span>📐 ~${tokens} tokens</span>
+    <span>📝 ${parts.length} sections</span>
+    ${docFlag}
+    <span>🔢 {{HISTORY}} + {{QUESTION}}</span>`;
   document.getElementById('promptOutput').textContent = final;
   showStep(3);
 }
@@ -916,12 +1215,12 @@ function downloadPrompt() {
   const ans  = collectAnswers();
   const name = (ans.persona || 'prompt').split(',')[0].trim().replace(/\s+/g,'_');
   const blob = new Blob([document.getElementById('promptOutput').textContent], { type: 'text/plain' });
-  const a    = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: `${name}_prompt.txt` });
+  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: `${name}_prompt.txt` });
   a.click(); URL.revokeObjectURL(a.href);
   showToast('Prompt downloaded!');
 }
 
-/* ─── RESET ──────────────────────────────────────────────────── */
+/* ─── RESET ─────────────────────────────────────────────────── */
 function resetAll() {
   document.getElementById('ideaInput').value = '';
   document.getElementById('ideaCount').textContent = '0 / 5000';
@@ -944,14 +1243,15 @@ function onIdeaInput() {
   cnt.classList.toggle('warn', len > IDEA_MAX * 0.9);
 }
 
-/* ─── TOAST ──────────────────────────────────────────────────── */
+/* ─── TOAST ─────────────────────────────────────────────────── */
 function showToast(msg) {
+  document.getElementById('toastMsg').textContent = msg;
   const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
 }
 
-/* ─── ESCAPE HTML ────────────────────────────────────────────── */
+/* ─── ESCAPE HTML ───────────────────────────────────────────── */
 function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
@@ -1019,7 +1319,8 @@ function loadTemplate(key, evt) {
   document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
   if (evt && evt.target) evt.target.classList.add('active');
   window._templateAnswers = t.answers;
-  showToast(`"${evt?.target?.textContent || key}" template loaded — click Analyse to continue.`);
+  const label = evt?.target?.textContent?.replace(/^[^\w]+/, '') || key;
+  showToast(`"${label}" template loaded — click Analyse to continue.`);
 }
 </script>
 </body>

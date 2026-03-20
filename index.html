@@ -335,26 +335,76 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ─── TEMPLATE CHIPS ────────────────────────────────────────── */
+    /* ─── TEMPLATE GALLERY ──────────────────────────────────────── */
     .template-section-label {
       font-size: 11.5px; font-weight: 700; letter-spacing: .6px;
-      text-transform: uppercase; color: var(--muted);
-      margin-bottom: 10px;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
     }
-    .template-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
-    .chip {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 7px 14px; border-radius: 100px;
-      font-size: 13px; font-weight: 600;
+    .tpl-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+    .tpl-tab {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 6px 14px; border-radius: 100px;
+      font-size: 12.5px; font-weight: 700;
       background: var(--bg-2); border: 1.5px solid var(--border); color: var(--muted);
-      cursor: pointer;
-      transition: all var(--t);
-      min-height: 36px;
+      cursor: pointer; transition: all var(--t); min-height: 34px; white-space: nowrap;
     }
-    .chip svg { width: 13px; height: 13px; }
-    .chip:hover { background: var(--primary-lt); border-color: var(--primary-border); color: var(--primary); }
-    .chip:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-    .chip.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .tpl-tab:hover { background: var(--primary-lt); border-color: var(--primary-border); color: var(--primary); }
+    .tpl-tab.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .tpl-tab:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+    .tpl-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 9px; margin-bottom: 20px;
+    }
+    .tpl-card {
+      display: flex; flex-direction: column; gap: 4px;
+      padding: 13px 15px; border-radius: var(--radius);
+      background: var(--bg-2); border: 1.5px solid var(--border);
+      cursor: pointer; transition: all var(--t); text-align: left;
+    }
+    .tpl-card:hover { background: var(--primary-lt); border-color: var(--primary-border); }
+    .tpl-card:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+    .tpl-card.active { background: var(--primary); border-color: var(--primary); }
+    .tpl-card-title {
+      font-size: 13px; font-weight: 800; color: var(--text);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .tpl-card.active .tpl-card-title { color: #fff; }
+    .tpl-card-title svg { width: 13px; height: 13px; color: var(--primary); flex-shrink: 0; }
+    .tpl-card.active .tpl-card-title svg { color: rgba(255,255,255,.85); }
+    .tpl-card-desc { font-size: 11.5px; color: var(--muted); line-height: 1.45; }
+    .tpl-card.active .tpl-card-desc { color: rgba(255,255,255,.7); }
+
+    /* ─── LEARNING FEEDBACK BAR ──────────────────────────────────── */
+    .feedback-bar {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      padding: 13px 16px; margin-top: 16px;
+      background: var(--bg-2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+    }
+    .feedback-label { font-size: 13px; font-weight: 600; color: var(--text-2); flex-shrink: 0; }
+    .feedback-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 100px; border: 1.5px solid var(--border);
+      background: var(--card); font-size: 13px; font-weight: 700;
+      color: var(--muted); cursor: pointer; transition: all var(--t); min-height: 36px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .feedback-btn svg { width: 13px; height: 13px; }
+    .feedback-btn.fb-good:hover,  .feedback-btn.fb-good.sel  { background: var(--success-lt); border-color: var(--success); color: var(--success); }
+    .feedback-btn.fb-bad:hover,   .feedback-btn.fb-bad.sel   { background: var(--error-lt); border-color: var(--error); color: var(--error); }
+    .feedback-btn.fb-redo:hover,  .feedback-btn.fb-redo.sel  { background: var(--cta-lt); border-color: var(--cta); color: var(--cta); }
+    .feedback-btn.sel { pointer-events: none; }
+    .session-bar {
+      display: flex; gap: 16px; align-items: center; flex-wrap: wrap;
+      padding: 9px 14px; background: var(--bg-2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); margin-bottom: 16px; font-size: 12.5px;
+    }
+    .session-stat { display: flex; align-items: center; gap: 5px; color: var(--muted); font-weight: 600; }
+    .session-stat svg { width: 12px; height: 12px; }
+    .session-stat strong { color: var(--primary); }
+
+    /* legacy .chip kept for JS compat */
+    .chip { display: none; }
 
     /* ─── PROGRESS BAR ──────────────────────────────────────────── */
     .progress-bar {
@@ -806,32 +856,27 @@
     </div>
 
     <div class="template-section-label" id="templates-label">Quick-start templates</div>
-    <div class="template-row" role="group" aria-labelledby="templates-label">
-      <button class="chip" onclick="loadTemplate('career',event)" type="button">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
-        Career Coach
-      </button>
-      <button class="chip" onclick="loadTemplate('support',event)" type="button">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        Customer Support
-      </button>
-      <button class="chip" onclick="loadTemplate('writer',event)" type="button">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-        Content Writer
-      </button>
-      <button class="chip" onclick="loadTemplate('tutor',event)" type="button">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-        Study Tutor
-      </button>
-      <button class="chip" onclick="loadTemplate('sales',event)" type="button">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
-        Sales Assistant
-      </button>
-      <button class="chip" onclick="loadTemplate('code',event)" type="button">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-        Code Reviewer
-      </button>
+
+    <!-- Session learning bar (hidden until 2+ prompts generated) -->
+    <div class="session-bar hidden" id="sessionBar">
+      <div class="session-stat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <span>Session: <strong id="sessionCount">0</strong> prompts</span>
+      </div>
+      <div class="session-stat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+        <span>Helpful: <strong id="sessionGood">0</strong></span>
+      </div>
+      <div class="session-stat" id="sessionInsightWrap" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="sessionInsight" style="color:var(--primary)"></span>
+      </div>
     </div>
+
+    <!-- Category tabs -->
+    <div class="tpl-tabs" role="tablist" aria-label="Template categories" id="tplTabs"></div>
+    <!-- Template cards -->
+    <div class="tpl-grid" role="group" aria-labelledby="templates-label" id="tplGrid"></div>
 
     <div class="field">
       <label for="ideaInput">
@@ -963,6 +1008,23 @@
       <button class="btn btn-secondary" onclick="resetAll()" type="button">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         New Prompt
+      </button>
+    </div>
+
+    <!-- Feedback bar — drives learning system -->
+    <div class="feedback-bar" id="feedbackBar">
+      <span class="feedback-label">Was this prompt useful?</span>
+      <button class="feedback-btn fb-good" id="fb-good" onclick="submitFeedback('good')" type="button" aria-label="Yes, this prompt was helpful">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+        Helpful
+      </button>
+      <button class="feedback-btn fb-bad" id="fb-bad" onclick="submitFeedback('bad')" type="button" aria-label="No, this prompt needs improvement">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>
+        Needs work
+      </button>
+      <button class="feedback-btn fb-redo" id="fb-redo" onclick="submitFeedback('redo')" type="button" aria-label="Regenerate with improvements">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>
+        Improve it
       </button>
     </div>
 
@@ -1232,6 +1294,7 @@ function scoreQ(q, idea) {
   const t = idea.toLowerCase(); let s = q.base;
   q.keywords.forEach(kw => { if (t.includes(kw)) s += 2; });
   q.anti.forEach(kw => { if (t.includes(kw)) s -= 3; });
+  s += (LEARN.scoreBoosts[q.id] || 0); // session-learning boost
   return Math.max(0, s);
 }
 function getRelevantQuestions(idea) {
@@ -1459,6 +1522,13 @@ async function generatePrompt() {
   document.getElementById('aiEnhancedBadge').classList.add('hidden');
   showStep(3);
 
+  // ── Session learning ──────────────────────────────────────
+  learnTrackFills(ans);
+  updateSessionBar();
+  LEARN.history.push({ idea, answers: ans, feedback: null, context: detectContext(idea) });
+  document.getElementById('feedbackBar').classList.remove('hidden');
+  ['fb-good','fb-bad','fb-redo'].forEach(id => document.getElementById(id)?.classList.remove('sel'));
+
   // ── Grok enhancement (async, non-blocking) ──────────────────
   if (_grokKey) {
     const ctx = detectContext(idea);
@@ -1558,33 +1628,249 @@ document.getElementById('themeToggle').addEventListener('click', () => {
   document.getElementById('themeToggle').setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
 });
 
-/* ─── TEMPLATES ─────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   TEMPLATE GALLERY — categorised (marketers, dropshippers, beginners…)
+═══════════════════════════════════════════════════════════════ */
+const TPL_CATEGORIES = [
+  { id: 'all',       label: 'All' },
+  { id: 'beginner',  label: 'Beginners' },
+  { id: 'marketing', label: 'Marketing' },
+  { id: 'ecommerce', label: 'E-commerce' },
+  { id: 'content',   label: 'Content' },
+  { id: 'support',   label: 'Support' },
+  { id: 'dev',       label: 'Developer' },
+  { id: 'career',    label: 'Career' },
+];
+
 const TEMPLATES = {
-  career: {
-    idea: `An AI career coach that helps users improve their resumes, prepare for interviews, and navigate job searches. It works with people at all career levels — from recent graduates to senior professionals looking to switch industries. The coach should ask clarifying questions, give personalised advice, and always end each session with one concrete next step.`,
-    answers: { persona: 'Alex, Career Coach at CareerPilot', tone: 'Encouraging & motivational', constraints: `Always celebrate progress, no matter how small\nNever give generic advice — personalise to the user's situation\nIf asked about salary, give a realistic range based on role and location\nAlways end with one actionable next step`, format: 'Plain paragraphs (conversational)', length: 'Medium (2-4 paragraphs)' }
+  /* ── Beginners ─────────────────────────────────────────── */
+  daily_assistant: {
+    cat: 'beginner',
+    title: 'Daily AI Assistant',
+    desc: 'General helper for everyday tasks',
+    idea: `A friendly AI assistant to help me with everyday tasks like writing emails, summarising articles, answering questions, planning my day, and explaining confusing topics in plain language. I'm new to AI and want it to be easy to use.`,
+    answers: { tone: 'Friendly & casual', format: 'Plain paragraphs (conversational)', length: 'Short (1 paragraph)', constraints: `Always explain things in simple, plain language — no jargon\nIf something is unclear, ask one clarifying question before answering\nKeep responses short and actionable` }
   },
-  support: {
-    idea: `A customer support agent for a SaaS product that handles troubleshooting, billing questions, and feature requests. It should follow our documented refund policy, escalate complex cases, and always verify the issue before suggesting a solution. The tone should be helpful and friendly even when the customer is frustrated.`,
-    answers: { persona: 'Sam, Support Specialist at NovaSoft', tone: 'Friendly & casual', document: 'product knowledge base and FAQ', constraints: `Always verify the issue before suggesting a solution\nNever promise features that don't exist\nEscalate unresolved billing disputes to billing@novasoft.com\nAlways close with "Is there anything else I can help with?"`, format: 'Numbered steps', escalation: `Say "Let me connect you with a specialist — please email billing@novasoft.com"` }
+  writing_helper: {
+    cat: 'beginner',
+    title: 'Writing Helper',
+    desc: 'Fix grammar, improve any writing',
+    idea: `An AI writing coach that helps me improve my writing. It should fix grammar and spelling, suggest better word choices, make my writing clearer and more engaging, and explain why it made changes so I can learn.`,
+    answers: { tone: 'Warm & empathetic', format: 'Plain paragraphs (conversational)', constraints: `Always show the original and improved version side by side\nExplain each change in one short sentence\nNever change the meaning of what I wrote\nBe encouraging — this is a learning tool` }
   },
-  writer: {
+  research_buddy: {
+    cat: 'beginner',
+    title: 'Research Buddy',
+    desc: 'Explain any topic simply',
+    idea: `An AI research assistant that helps me understand any topic quickly. It should explain things simply, give me the key facts, and let me know what else I should research. Good for students, curious people, or anyone who wants to learn faster.`,
+    answers: { tone: 'Friendly & casual', format: 'Bullet points / lists', length: 'Medium (2-4 paragraphs)', constraints: `Always start with a 1-sentence summary\nUse analogies to explain hard concepts\nAlways end with 3 follow-up questions I could explore` }
+  },
+
+  /* ── Marketing ─────────────────────────────────────────── */
+  ad_copy: {
+    cat: 'marketing',
+    title: 'Ad Copy Writer',
+    desc: 'Facebook, Google & TikTok ads',
+    idea: `A paid advertising copywriter that creates high-converting ad copy for Facebook Ads, Google Ads, and TikTok Ads. It should write compelling headlines, primary text, and CTAs that grab attention and drive clicks. It understands direct response marketing principles.`,
+    answers: { persona: 'Max, Performance Marketing Specialist', audience: 'Online shoppers aged 18-45 browsing social media', tone: 'Direct & concise', constraints: `Always write at least 3 headline variations\nKeep Facebook primary text under 125 characters for preview\nAlways include a clear, urgent CTA\nFocus on pain points and transformation, not just features\nNever make unsubstantiated claims (e.g. "best in the world")`, format: 'Numbered steps', length: 'Medium (2-4 paragraphs)' }
+  },
+  email_marketing: {
+    cat: 'marketing',
+    title: 'Email Campaign Writer',
+    desc: 'Newsletters, promos & sequences',
+    idea: `An email marketing specialist that writes high-open-rate email campaigns. It creates subject lines that get opened, body copy that builds connection, and CTAs that convert. It knows how to write for both nurture sequences and promotional campaigns.`,
+    answers: { persona: 'Sarah, Email Marketing Manager', audience: 'Email subscribers who opted in to receive marketing content', tone: 'Friendly & casual', constraints: `Always write 5 subject line options with preview text\nKeep emails scannable — short paragraphs, one idea per section\nEvery email must have one clear CTA\nAvoid spam trigger words (free, guaranteed, act now)\nPersonalise using {{first_name}} placeholder`, format: 'Numbered steps' }
+  },
+  seo_blog: {
+    cat: 'marketing',
+    title: 'SEO Blog Writer',
+    desc: 'Rank on Google with optimised posts',
+    idea: `An SEO content strategist and writer that creates blog posts optimised to rank on Google. It should research topics thoroughly, use proper heading structure (H1/H2/H3), include target keywords naturally, and write content that genuinely helps readers while satisfying search intent.`,
+    answers: { persona: 'Dana, SEO Content Strategist', tone: 'Expert & authoritative', domain: 'SEO, content marketing, search intent, keyword optimisation', constraints: `Always ask for the target keyword before writing\nUse the target keyword in H1, first paragraph, and 2-3 subheadings\nInclude a meta description under 160 characters\nAim for 1500-2000 words for competitive topics\nEnd with a clear CTA or internal link suggestion`, format: 'Markdown (headers, bold, code blocks)', length: 'Detailed & comprehensive' }
+  },
+  social_media: {
+    cat: 'marketing',
+    title: 'Social Media Manager',
+    desc: 'Instagram, LinkedIn & X posts',
+    idea: `A social media content creator that writes engaging posts for Instagram, LinkedIn, and X (Twitter). It matches the platform's tone and format, uses hashtags strategically, writes hooks that stop the scroll, and adapts brand voice for each platform.`,
+    answers: { persona: 'Alex, Social Media Manager', tone: 'Direct & concise', constraints: `Always write platform-specific versions (Instagram, LinkedIn, X)\nInstagram: emoji-friendly, storytelling, 5-10 hashtags\nLinkedIn: professional story format, no hashtag spam\nX/Twitter: punchy, under 280 chars for main post\nAlways include a hook in the first line that creates curiosity`, format: 'Numbered steps' }
+  },
+  influencer_outreach: {
+    cat: 'marketing',
+    title: 'Influencer Outreach',
+    desc: 'DMs & emails to land collabs',
+    idea: `An influencer marketing specialist that writes personalised outreach messages to influencers and content creators for collaboration and brand partnership opportunities. It should sound genuine, not spammy, and clearly communicate the value of the partnership.`,
+    answers: { persona: 'Jamie, Brand Partnerships Manager', tone: 'Friendly & casual', constraints: `Always personalise with the influencer's recent content or achievement\nKeep DMs under 150 words\nAlways lead with what's in it for them, not what you need\nInclude specific collaboration idea, not vague "let's collab"\nNever use copy-paste-feeling openers`, format: 'Plain paragraphs (conversational)' }
+  },
+
+  /* ── E-commerce / Dropshipping ─────────────────────────── */
+  product_desc: {
+    cat: 'ecommerce',
+    title: 'Product Description Writer',
+    desc: 'Shopify, Amazon & WooCommerce',
+    idea: `An e-commerce copywriter that writes compelling product descriptions for Shopify, Amazon, and WooCommerce. It should highlight benefits over features, use sensory language, address common objections, and include SEO keywords. Perfect for dropshippers and online store owners.`,
+    answers: { persona: 'Chris, E-commerce Copywriter', audience: 'Online shoppers comparing products before buying', tone: 'Direct & concise', constraints: `Always start with the #1 customer benefit, not the product spec\nUse "you" language throughout — speak directly to the customer\nInclude bullet points for key features/specs\nAddress the top 2 objections (price, quality, shipping)\nEnd with urgency or social proof statement`, format: 'Bullet points / lists', length: 'Medium (2-4 paragraphs)' }
+  },
+  amazon_listing: {
+    cat: 'ecommerce',
+    title: 'Amazon Listing Optimizer',
+    desc: 'Title, bullets & A+ content',
+    idea: `An Amazon listing specialist that optimises product listings for maximum visibility and conversion. It writes keyword-rich titles, 5 bullet points, product descriptions, and backend search terms following Amazon's guidelines and A9 algorithm best practices.`,
+    answers: { persona: 'Taylor, Amazon SEO Specialist', domain: 'Amazon SEO, A9 algorithm, e-commerce conversion optimisation', constraints: `Title: include brand + main keyword + top 2 features, max 200 chars\n5 bullet points: start with ALL CAPS benefit headline\nDescription: tell the product story, 2000 chars max\nAlways suggest 10 backend search terms\nNever keyword stuff — must read naturally\nHighlight Prime eligibility and return policy if applicable`, format: 'Numbered steps', length: 'Detailed & comprehensive' }
+  },
+  dropship_product: {
+    cat: 'ecommerce',
+    title: 'Winning Product Finder',
+    desc: 'Evaluate & validate products',
+    idea: `A dropshipping product research assistant that helps me evaluate whether a product is worth selling. It analyses market demand, competition level, profit margins, target audience, and suggests winning angles. It should think like an experienced dropshipper.`,
+    answers: { persona: 'Morgan, 7-Figure Dropshipper', audience: 'Beginner to intermediate dropshippers', tone: 'Direct & concise', domain: 'Dropshipping, e-commerce, Shopify, product research, AliExpress, CJ Dropshipping', constraints: `Always score the product 1-10 on: demand, competition, margin, wow-factor\nIdentify the core emotional trigger for buying this product\nSuggest the 3 best target audiences on Facebook/TikTok\nHighlight any red flags (seasonal, fragile, heavy, etc.)\nAlways recommend a selling price range based on perceived value`, format: 'Numbered steps' }
+  },
+  review_responder: {
+    cat: 'ecommerce',
+    title: 'Review Responder',
+    desc: 'Reply to 1-star & 5-star reviews',
+    idea: `A customer experience specialist that writes professional, empathetic responses to product reviews on Amazon, Shopify, Google, and Etsy. It handles both positive reviews (to build brand loyalty) and negative reviews (to de-escalate and show accountability).`,
+    answers: { persona: 'Sam, Customer Experience Manager', tone: 'Warm & empathetic', constraints: `Negative reviews: acknowledge, apologise, offer solution, take offline\nPositive reviews: thank personally, reinforce brand value, invite back\nKeep all responses under 100 words\nNever be defensive or dismissive\nAlways end with an invitation to return or contact support`, format: 'Plain paragraphs (conversational)', length: 'Very brief (1-2 sentences)' }
+  },
+
+  /* ── Content Creation ──────────────────────────────────── */
+  youtube_script: {
+    cat: 'content',
+    title: 'YouTube Script Writer',
+    desc: 'Hook, body & CTA for videos',
+    idea: `A YouTube scriptwriter that creates engaging video scripts optimised for watch time and audience retention. It writes strong hooks (first 30 seconds), clear structured content, pattern interrupts to reduce drop-off, and compelling end-screen CTAs. It knows the YouTube algorithm rewards watch time.`,
+    answers: { persona: 'Jordan, YouTube Content Strategist', audience: 'YouTube viewers who clicked on the video title/thumbnail', tone: 'Friendly & casual', constraints: `Open with a hook that creates a pattern interrupt or curiosity gap\nPromise the payoff in the first 30 seconds\nUse "but wait" and "here's the thing" transitions to reset attention\nInclude a subscribe mention at the 20% mark naturally\nEnd with a clear CTA: comment, subscribe, or watch next video`, format: 'Numbered steps', length: 'Detailed & comprehensive' }
+  },
+  tiktok_ideas: {
+    cat: 'content',
+    title: 'TikTok Content Planner',
+    desc: 'Viral hooks & 30-day content plan',
+    idea: `A TikTok content strategist that helps creators plan viral content. It generates hook ideas, video concepts, trending sounds to use, hashtag strategies, and 30-day content calendars. It understands the TikTok algorithm and what makes content go viral.`,
+    answers: { tone: 'Playful & creative', audience: 'TikTok users scrolling the For You Page', constraints: `Always start video ideas with the first-line hook text\nSuggest trending audio/sound where relevant\nGroup content ideas into 3 content pillars (entertain/educate/inspire)\nInclude the emotional trigger each video hits\nSuggest optimal posting time and frequency`, format: 'Bullet points / lists' }
+  },
+  content_writer: {
+    cat: 'content',
+    title: 'Brand Content Writer',
+    desc: 'Blog, email & social for DTC brands',
     idea: `A content writer assistant that creates blog posts, social media captions, and email newsletters for a DTC lifestyle brand. It should match our brand voice — approachable, confident, never try-hard — and always end long-form content with a clear CTA. It should avoid marketing buzzwords and keep sentences short and punchy.`,
     answers: { persona: 'Riley, Content Strategist at BrandVoice', audience: 'Millennial and Gen-Z consumers interested in lifestyle, wellness, and design', tone: 'Direct & concise', document: 'brand voice guidelines and style guide', constraints: `Always match the brand tone — approachable but confident\nKeep sentences under 20 words\nAlways suggest a CTA at the end of long-form content\nNever use buzzwords like "synergy", "leverage", or "game-changer"`, format: 'Plain paragraphs (conversational)', length: 'Adaptive — short for simple, detailed for complex' }
   },
-  tutor: {
-    idea: `A study tutor for high school and early university students preparing for standardised tests like SAT, ACT, GMAT, or IB exams. It should explain the 'why' behind every answer, break complex concepts into steps, and always follow up with a question to check the student's understanding. It should never make the student feel bad for not knowing something.`,
-    answers: { persona: 'Max, Academic Tutor at StudyPro', audience: 'Students aged 16–22 preparing for standardised exams', tone: 'Warm & empathetic', constraints: `Always explain the "why" behind every answer\nNever make a student feel bad for not knowing something\nBreak complex concepts into smaller steps\nAfter explaining, always ask a follow-up question to check understanding`, format: 'Numbered steps', length: 'Detailed & comprehensive' }
+  podcast_outline: {
+    cat: 'content',
+    title: 'Podcast Outline Creator',
+    desc: 'Structure episodes & interview Qs',
+    idea: `A podcast producer that helps structure episodes, creates interview question sets, writes show notes, and suggests episode titles. It helps hosts stay on topic, create natural flow, and extract maximum value from each conversation.`,
+    answers: { tone: 'Friendly & casual', constraints: `Always create a cold open hook (what will listeners learn?)\nStructure as: intro → context → 3-5 key segments → takeaway → CTA\nFor interviews: create 10 questions from easy → deep → controversial\nWrite show notes with timestamps and 5 key takeaways\nSuggest 3 episode title options with different angles`, format: 'Numbered steps', length: 'Detailed & comprehensive' }
   },
-  sales: {
+
+  /* ── Customer Support ──────────────────────────────────── */
+  support_agent: {
+    cat: 'support',
+    title: 'SaaS Support Agent',
+    desc: 'Tickets, billing & troubleshooting',
+    idea: `A customer support agent for a SaaS product that handles troubleshooting, billing questions, and feature requests. It should follow our documented refund policy, escalate complex cases, and always verify the issue before suggesting a solution. The tone should be helpful and friendly even when the customer is frustrated.`,
+    answers: { persona: 'Sam, Support Specialist at NovaSoft', tone: 'Friendly & casual', document: 'product knowledge base and FAQ', constraints: `Always verify the issue before suggesting a solution\nNever promise features that don't exist\nEscalate unresolved billing disputes to billing@novasoft.com\nAlways close with "Is there anything else I can help with?"`, format: 'Numbered steps', escalation: `Say "Let me connect you with a specialist — please email billing@novasoft.com"` }
+  },
+  ecom_support: {
+    cat: 'support',
+    title: 'E-commerce Support Bot',
+    desc: 'Orders, returns & delivery issues',
+    idea: `A customer support bot for an e-commerce store that handles order status questions, return and refund requests, shipping issues, and product questions. It should be empathetic, fast, and always try to resolve the issue without escalating.`,
+    answers: { persona: 'Alex, Customer Care Specialist', tone: 'Warm & empathetic', document: 'return policy, shipping policy, and FAQ', constraints: `Always check order status before suggesting troubleshooting\nFor refund requests: acknowledge frustration, confirm eligibility, initiate process\nNever argue with a customer about their experience\nFor shipping delays: apologise, give realistic timeline, offer discount code\nAlways end with a satisfaction check`, format: 'Plain paragraphs (conversational)', escalation: `Escalate to human agent if customer asks 3+ times or mentions chargeback` }
+  },
+
+  /* ── Developer ─────────────────────────────────────────── */
+  code_review: {
+    cat: 'dev',
+    title: 'Code Reviewer',
+    desc: 'Security, performance & quality',
+    idea: `A code review assistant for a team of full-stack engineers working in TypeScript and Python. It should review pull requests for security vulnerabilities, performance issues, and code quality. It should explain every issue it finds with a reason and a suggested fix, follow our internal style guide, and never rewrite code without first explaining why.`,
+    answers: { audience: 'Mid-level to senior full-stack engineers', domain: 'TypeScript, Python, REST API design, security best practices, performance optimisation', constraints: `Always explain the reason for each suggestion\nNever rewrite code without explaining why\nFollow the internal style guide (camelCase, no magic numbers, clear variable names)\nFlag security vulnerabilities as HIGH priority`, format: 'Markdown (headers, bold, code blocks)', length: 'Detailed & comprehensive' }
+  },
+  docs_writer: {
+    cat: 'dev',
+    title: 'Technical Docs Writer',
+    desc: 'READMEs, API docs & guides',
+    idea: `A technical documentation writer that creates clear, comprehensive documentation for software projects. It writes READMEs, API reference docs, setup guides, and code comments. It understands developer needs — concise, searchable, with plenty of code examples.`,
+    answers: { audience: 'Developers integrating or contributing to the project', tone: 'Expert & authoritative', domain: 'Software development, API design, developer experience', constraints: `Always start docs with a one-line description + installation command\nUse code blocks for every example\nInclude a "Quick Start" section that works in under 5 minutes\nDocument all parameters with type, required/optional, and default values\nEnd with a Contributing section and license`, format: 'Markdown (headers, bold, code blocks)', length: 'Detailed & comprehensive' }
+  },
+
+  /* ── Career ─────────────────────────────────────────────── */
+  career_coach: {
+    cat: 'career',
+    title: 'Career Coach',
+    desc: 'Resume, interviews & job search',
+    idea: `An AI career coach that helps users improve their resumes, prepare for interviews, and navigate job searches. It works with people at all career levels — from recent graduates to senior professionals looking to switch industries. The coach should ask clarifying questions, give personalised advice, and always end each session with one concrete next step.`,
+    answers: { persona: 'Alex, Career Coach at CareerPilot', tone: 'Encouraging & motivational', constraints: `Always celebrate progress, no matter how small\nNever give generic advice — personalise to the user's situation\nIf asked about salary, give a realistic range based on role and location\nAlways end with one actionable next step`, format: 'Plain paragraphs (conversational)', length: 'Medium (2-4 paragraphs)' }
+  },
+  sales_enablement: {
+    cat: 'career',
+    title: 'Sales Assistant',
+    desc: 'Outreach, discovery calls & CRM',
     idea: `A sales enablement assistant that helps account executives qualify leads against our ICP, craft personalised outreach emails, and prepare for discovery calls. It should reference our product overview and pricing tiers, always frame benefits around the prospect's specific pain, and recommend looping in a sales engineer for enterprise deals.`,
     answers: { persona: 'Jordan, Sales AI at PipelineHQ', audience: 'Account executives and SDRs handling mid-market and enterprise deals', tone: 'Professional & formal', document: 'product overview, pricing tiers, and ICP definition', domain: 'B2B SaaS sales, enterprise deal cycles, account-based marketing', constraints: `Always qualify leads against the ICP before pitching\nNever fabricate pricing — always refer to the document\nFor enterprise deals, recommend looping in a sales engineer\nFrame benefits in terms of the prospect's specific pain`, format: 'Numbered steps' }
   },
-  code: {
-    idea: `A code review assistant for a team of full-stack engineers working in TypeScript and Python. It should review pull requests for security vulnerabilities, performance issues, and code quality. It should explain every issue it finds with a reason and a suggested fix, follow our internal style guide, and never rewrite code without first explaining why.`,
-    answers: { audience: 'Mid-level to senior full-stack engineers', domain: 'TypeScript, Python, REST API design, security best practices, performance optimisation', constraints: `Always explain the reason for each suggestion\nNever rewrite code without explaining why\nFollow the internal style guide (camelCase, no magic numbers, clear variable names)\nFlag security vulnerabilities as HIGH priority`, format: 'Markdown (headers, bold, code blocks)', length: 'Detailed & comprehensive' }
-  }
+  study_tutor: {
+    cat: 'career',
+    title: 'Study Tutor',
+    desc: 'SAT, ACT, GMAT & IB exam prep',
+    idea: `A study tutor for high school and early university students preparing for standardised tests like SAT, ACT, GMAT, or IB exams. It should explain the 'why' behind every answer, break complex concepts into steps, and always follow up with a question to check the student's understanding. It should never make the student feel bad for not knowing something.`,
+    answers: { persona: 'Max, Academic Tutor at StudyPro', audience: 'Students aged 16–22 preparing for standardised exams', tone: 'Warm & empathetic', constraints: `Always explain the "why" behind every answer\nNever make a student feel bad for not knowing something\nBreak complex concepts into smaller steps\nAfter explaining, always ask a follow-up question to check understanding`, format: 'Numbered steps', length: 'Detailed & comprehensive' }
+  },
 };
+
+/* ─── TEMPLATE GALLERY RENDER ───────────────────────────────── */
+let _activeCat = 'all';
+let _activeTemplateKey = null;
+
+function renderTemplateGallery(cat) {
+  _activeCat = cat;
+  // Update tabs
+  document.querySelectorAll('.tpl-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.cat === cat);
+    t.setAttribute('aria-selected', t.dataset.cat === cat ? 'true' : 'false');
+  });
+  // Filter templates
+  const keys = cat === 'all'
+    ? Object.keys(TEMPLATES)
+    : Object.keys(TEMPLATES).filter(k => TEMPLATES[k].cat === cat);
+
+  const grid = document.getElementById('tplGrid');
+  grid.innerHTML = '';
+  keys.forEach(key => {
+    const t = TEMPLATES[key];
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'tpl-card' + (key === _activeTemplateKey ? ' active' : '');
+    card.setAttribute('aria-pressed', key === _activeTemplateKey ? 'true' : 'false');
+    card.setAttribute('aria-label', `Load template: ${t.title}`);
+    card.dataset.key = key;
+    card.innerHTML = `
+      <div class="tpl-card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        ${escHtml(t.title)}
+      </div>
+      <div class="tpl-card-desc">${escHtml(t.desc)}</div>`;
+    card.onclick = () => loadTemplate(key, card);
+    grid.appendChild(card);
+  });
+}
+
+function initTemplateGallery() {
+  const tabs = document.getElementById('tplTabs');
+  TPL_CATEGORIES.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'tpl-tab' + (cat.id === 'all' ? ' active' : '');
+    btn.dataset.cat = cat.id;
+    btn.setAttribute('role', 'tab');
+    btn.setAttribute('aria-selected', cat.id === 'all' ? 'true' : 'false');
+    btn.textContent = cat.label;
+    btn.onclick = () => renderTemplateGallery(cat.id);
+    tabs.appendChild(btn);
+  });
+  renderTemplateGallery('all');
+}
 
 function applyTemplateAnswers(answers, questions) {
   questions.forEach(q => {
@@ -1606,17 +1892,106 @@ function applyTemplateAnswers(answers, questions) {
   updateProgress();
 }
 
-function loadTemplate(key, evt) {
+function loadTemplate(key, cardEl) {
   const t = TEMPLATES[key]; if (!t) return;
+  _activeTemplateKey = key;
   document.getElementById('ideaInput').value = t.idea;
   onIdeaInput();
-  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-  const btn = evt?.currentTarget || evt?.target;
-  if (btn) btn.classList.add('active');
+  // Re-render grid to update active state
+  renderTemplateGallery(_activeCat);
   window._templateAnswers = t.answers;
-  const label = btn?.textContent?.trim() || key;
-  showToast(`"${label}" template loaded — click Analyse to continue.`);
+  showToast(`"${t.title}" loaded — click Analyse to continue.`);
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   SESSION LEARNING ENGINE
+   Tracks fills, feedback & adapts Q scoring over the session
+═══════════════════════════════════════════════════════════════ */
+const LEARN = {
+  promptCount: 0,
+  goodCount: 0,
+  badCount: 0,
+  qFillRate: {},   // qid → { filled, total }
+  scoreBoosts: {}, // qid → delta applied to base score
+  history: [],     // { idea, answers, feedback, context }
+};
+
+function learnTrackFills(answers) {
+  Object.keys(answers).forEach(qid => {
+    if (!LEARN.qFillRate[qid]) LEARN.qFillRate[qid] = { filled: 0, total: 0 };
+    LEARN.qFillRate[qid].total++;
+    if (answers[qid]) LEARN.qFillRate[qid].filled++;
+  });
+}
+
+function learnApplyBoosts() {
+  // Questions users consistently fill → boost; consistently skip → small reduce
+  Object.keys(LEARN.qFillRate).forEach(qid => {
+    const { filled, total } = LEARN.qFillRate[qid];
+    const rate = total > 0 ? filled / total : 0;
+    LEARN.scoreBoosts[qid] = rate > 0.7 ? 3 : rate < 0.2 ? -1 : 0;
+  });
+}
+
+function learnGetInsight() {
+  if (LEARN.promptCount < 2) return null;
+  const topQ = Object.entries(LEARN.qFillRate)
+    .filter(([,v]) => v.total > 0)
+    .sort(([,a],[,b]) => (b.filled/b.total) - (a.filled/a.total))[0];
+  if (!topQ) return null;
+  const qObj = Q_POOL.find(q => q.id === topQ[0]);
+  if (!qObj) return null;
+  const pct = LEARN.goodCount > 0
+    ? `${Math.round(LEARN.goodCount/LEARN.promptCount*100)}% rated helpful`
+    : null;
+  return pct ? `${qObj.label} boosts quality · ${pct}` : `${qObj.label} is your top field`;
+}
+
+function updateSessionBar() {
+  LEARN.promptCount++;
+  const bar = document.getElementById('sessionBar');
+  bar.classList.remove('hidden');
+  document.getElementById('sessionCount').textContent = LEARN.promptCount;
+  document.getElementById('sessionGood').textContent  = LEARN.goodCount;
+  const insight = learnGetInsight();
+  if (insight) {
+    document.getElementById('sessionInsight').textContent = insight;
+    document.getElementById('sessionInsightWrap').style.display = 'flex';
+  }
+  learnApplyBoosts();
+}
+
+function submitFeedback(type) {
+  // Mark selected button
+  ['fb-good','fb-bad','fb-redo'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('sel');
+  });
+  document.getElementById(`fb-${type}`)?.classList.add('sel');
+
+  if (type === 'good') {
+    LEARN.goodCount++;
+    LEARN.history[LEARN.history.length-1].feedback = 'good';
+    showToast('Thanks! Scoring updated to prioritise what works for you.');
+  } else if (type === 'bad') {
+    LEARN.history[LEARN.history.length-1].feedback = 'bad';
+    showToast('Noted — prompts will be adjusted based on your feedback.');
+  } else if (type === 'redo') {
+    LEARN.history[LEARN.history.length-1].feedback = 'redo';
+    showToast('Regenerating with improvements…');
+    // Boost constraints & length in next generation
+    LEARN.scoreBoosts['constraints'] = (LEARN.scoreBoosts['constraints'] || 0) + 2;
+    LEARN.scoreBoosts['length']      = (LEARN.scoreBoosts['length']      || 0) + 2;
+    setTimeout(() => generatePrompt(), 400);
+    return;
+  }
+  document.getElementById('sessionGood').textContent = LEARN.goodCount;
+}
+
+/* ─── PAGE INIT ─────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
+  initTemplateGallery();
+});
 </script>
 </body>
 </html>

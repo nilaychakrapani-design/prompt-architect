@@ -563,6 +563,89 @@
     /* ─── HIDDEN ────────────────────────────────────────────────── */
     .hidden { display: none !important; }
 
+    /* ─── GROK API BANNER ───────────────────────────────────────── */
+    .grok-banner {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px 22px;
+      margin-bottom: 20px;
+      display: flex; align-items: center; gap: 14px;
+      box-shadow: var(--shadow-sm);
+      transition: border-color var(--t);
+    }
+    .grok-banner.connected {
+      border-color: var(--success);
+      background: var(--success-lt);
+    }
+    .grok-banner-icon {
+      width: 40px; height: 40px; border-radius: var(--radius);
+      background: #000; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    [data-theme="dark"] .grok-banner-icon { background: #fff; }
+    .grok-banner-icon svg { width: 22px; height: 22px; }
+    .grok-banner-body { flex: 1; min-width: 0; }
+    .grok-banner-title {
+      font-size: 13.5px; font-weight: 800;
+      letter-spacing: -.2px; margin-bottom: 2px;
+    }
+    .grok-banner-sub { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+    .grok-banner-sub a { color: var(--primary); text-decoration: none; }
+    .grok-banner-sub a:hover { text-decoration: underline; }
+    .grok-banner-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; flex-wrap: wrap; }
+
+    /* Inline key input form */
+    .grok-key-form {
+      display: flex; gap: 7px; align-items: center;
+      margin-top: 10px; flex-wrap: wrap;
+    }
+    .grok-key-input {
+      flex: 1; min-width: 220px;
+      padding: 9px 12px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border); background: var(--bg);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px; color: var(--text);
+      outline: none; transition: border-color var(--t), box-shadow var(--t);
+      letter-spacing: .5px;
+    }
+    .grok-key-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-lt); }
+    .grok-key-input::placeholder { font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: 0; opacity: .6; }
+
+    /* Status pill */
+    .grok-status {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 12px; font-weight: 700;
+      padding: 4px 10px; border-radius: 100px;
+    }
+    .grok-status.active  { background: var(--success-lt); color: var(--success); border: 1px solid rgba(5,150,105,.2); }
+    .grok-status.inactive{ background: var(--bg-2); color: var(--muted); border: 1px solid var(--border); }
+    .grok-status-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+
+    /* "AI Enhanced" badge on output */
+    .ai-enhanced-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: #000; color: #fff;
+      font-size: 11px; font-weight: 700; letter-spacing: .4px;
+      padding: 3px 10px; border-radius: 100px;
+      text-transform: uppercase;
+    }
+    [data-theme="dark"] .ai-enhanced-badge { background: #fff; color: #000; }
+    .ai-enhanced-badge svg { width: 10px; height: 10px; }
+
+    /* Grok thinking state */
+    .grok-thinking {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 16px;
+      background: var(--bg-2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); margin-bottom: 16px;
+      font-size: 13px; color: var(--muted); font-weight: 500;
+    }
+    .grok-thinking .spinner {
+      width: 16px; height: 16px;
+      border-width: 2px;
+    }
+
     /* ─── FOOTER ────────────────────────────────────────────────── */
     footer {
       text-align: center; font-size: 13px; color: var(--muted);
@@ -650,6 +733,47 @@
 </div>
 
 <div class="container">
+
+  <!-- ── GROK API BANNER ── -->
+  <div class="grok-banner" id="grokBanner" role="complementary" aria-label="Grok AI enhancement">
+    <div class="grok-banner-icon" aria-hidden="true">
+      <!-- xAI / Grok "X" logo -->
+      <svg viewBox="0 0 24 24" fill="currentColor" style="color:#fff">
+        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+      </svg>
+    </div>
+    <div class="grok-banner-body">
+      <div class="grok-banner-title" id="grokBannerTitle">Enhance with Grok AI <span style="font-weight:400;color:var(--muted);font-size:12px;">— optional</span></div>
+      <div class="grok-banner-sub" id="grokBannerSub">
+        Connect your Grok API key to enrich prompts with real-world context, industry trends &amp; best practices.
+        <a href="https://console.x.ai" target="_blank" rel="noopener">Get a key →</a>
+      </div>
+      <!-- Key entry form — shown when not connected -->
+      <div class="grok-key-form" id="grokKeyForm">
+        <input
+          type="password"
+          class="grok-key-input"
+          id="grokKeyInput"
+          placeholder="xai-••••••••••••••••••••••"
+          aria-label="Grok API key"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button class="btn btn-primary" onclick="connectGrok()" type="button" id="grokConnectBtn" style="padding:8px 16px;font-size:13px;min-height:38px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          Connect
+        </button>
+      </div>
+    </div>
+    <div class="grok-banner-actions" id="grokBannerActions">
+      <span class="grok-status inactive" id="grokStatusPill">
+        <span class="grok-status-dot"></span> Not connected
+      </span>
+      <button class="icon-btn" onclick="dismissGrokBanner()" aria-label="Dismiss Grok banner" title="Dismiss" style="flex-shrink:0">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
 
   <!-- TIPS PANEL -->
   <div class="tips" id="tipsPanel" role="note">
@@ -798,7 +922,19 @@
       </div>
     </div>
 
-    <div class="prompt-meta" id="promptMeta" aria-label="Prompt metadata"></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+      <div class="prompt-meta" id="promptMeta" aria-label="Prompt metadata" style="margin-bottom:0;flex:1;"></div>
+      <span class="ai-enhanced-badge hidden" id="aiEnhancedBadge" aria-label="Prompt enhanced by Grok AI">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        Grok Enhanced
+      </span>
+    </div>
+
+    <!-- Grok thinking indicator (shown while API call in progress) -->
+    <div class="grok-thinking hidden" id="grokThinking" role="status" aria-live="polite">
+      <div class="spinner" style="border-color:var(--border);border-top-color:var(--primary);"></div>
+      <span>Grok is adding real-world context to your prompt…</span>
+    </div>
 
     <div class="output-wrapper" role="region" aria-label="Generated prompt output">
       <div class="output-bar">
@@ -864,6 +1000,143 @@
 </footer>
 
 <script>
+/* ═══════════════════════════════════════════════════════════════
+   GROK API — KEY MANAGEMENT & ENHANCEMENT
+═══════════════════════════════════════════════════════════════ */
+let _grokKey = null; // stored in memory only (no localStorage)
+
+function connectGrok() {
+  const input = document.getElementById('grokKeyInput');
+  const key   = input.value.trim();
+
+  if (!key) { showToast('Please paste your Grok API key first.'); input.focus(); return; }
+  if (!key.startsWith('xai-')) {
+    showToast('Grok keys start with "xai-" — please check and try again.');
+    input.focus(); return;
+  }
+
+  const btn = document.getElementById('grokConnectBtn');
+  btn.disabled = true;
+  btn.innerHTML = `<div class="btn-spinner"></div> Verifying…`;
+
+  // Verify key with a lightweight API call
+  fetch('https://api.x.ai/v1/models', {
+    headers: { 'Authorization': `Bearer ${key}` }
+  })
+  .then(r => {
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json();
+  })
+  .then(() => {
+    _grokKey = key;
+    setGrokConnected(true);
+    showToast('Grok connected! Your prompts will be AI-enhanced.');
+  })
+  .catch(err => {
+    btn.disabled = false;
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Connect`;
+    const msg = err.message.includes('401') || err.message.includes('403')
+      ? 'Invalid API key — please double-check and try again.'
+      : 'Could not reach Grok API. Check your key and connection.';
+    showToast(msg);
+    document.getElementById('errorRegion').textContent = msg;
+  });
+}
+
+function setGrokConnected(connected) {
+  const banner  = document.getElementById('grokBanner');
+  const pill    = document.getElementById('grokStatusPill');
+  const form    = document.getElementById('grokKeyForm');
+  const title   = document.getElementById('grokBannerTitle');
+  const sub     = document.getElementById('grokBannerSub');
+  const actions = document.getElementById('grokBannerActions');
+
+  if (connected) {
+    banner.classList.add('connected');
+    title.innerHTML  = 'Grok AI connected <span style="font-weight:400;color:var(--success);font-size:12px;">— prompts will be enhanced</span>';
+    sub.innerHTML    = 'Each prompt you generate will be enriched with real-world context, current industry practices, and intelligent suggestions from Grok.';
+    form.classList.add('hidden');
+    pill.className   = 'grok-status active';
+    pill.innerHTML   = '<span class="grok-status-dot"></span> Connected';
+    // Add disconnect button
+    if (!document.getElementById('grokDisconnectBtn')) {
+      const dbtn = document.createElement('button');
+      dbtn.id        = 'grokDisconnectBtn';
+      dbtn.className = 'btn btn-ghost';
+      dbtn.style     = 'padding:6px 10px;font-size:12px;min-height:32px;';
+      dbtn.setAttribute('type', 'button');
+      dbtn.setAttribute('aria-label', 'Disconnect Grok API');
+      dbtn.textContent = 'Disconnect';
+      dbtn.onclick = disconnectGrok;
+      actions.insertBefore(dbtn, actions.firstChild);
+    }
+  } else {
+    _grokKey = null;
+    banner.classList.remove('connected');
+    title.innerHTML = 'Enhance with Grok AI <span style="font-weight:400;color:var(--muted);font-size:12px;">— optional</span>';
+    sub.innerHTML   = 'Connect your Grok API key to enrich prompts with real-world context, industry trends &amp; best practices. <a href="https://console.x.ai" target="_blank" rel="noopener">Get a key →</a>';
+    form.classList.remove('hidden');
+    pill.className   = 'grok-status inactive';
+    pill.innerHTML   = '<span class="grok-status-dot"></span> Not connected';
+    document.getElementById('grokKeyInput').value = '';
+    document.getElementById('grokConnectBtn').disabled = false;
+    document.getElementById('grokConnectBtn').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Connect`;
+    const dbtn = document.getElementById('grokDisconnectBtn');
+    if (dbtn) dbtn.remove();
+  }
+}
+
+function disconnectGrok() { setGrokConnected(false); showToast('Grok disconnected.'); }
+
+function dismissGrokBanner() {
+  const b = document.getElementById('grokBanner');
+  b.style.transition = 'opacity 200ms ease, transform 200ms ease';
+  b.style.opacity = '0'; b.style.transform = 'translateY(-6px)';
+  setTimeout(() => b.classList.add('hidden'), 210);
+}
+
+/* ── Call Grok to enrich the generated prompt ── */
+async function enhancePromptWithGrok(basePrompt, idea, context) {
+  if (!_grokKey) return null;
+
+  const systemMsg = `You are an expert prompt engineer. A user has generated a structured AI system prompt. Your job is to ENHANCE it by adding:
+1. A concise "Industry Context" section with 2-3 current real-world facts, trends, or best practices relevant to the use case
+2. Up to 3 additional smart constraints or behaviours that experts in this domain typically include
+3. A brief "Success Criteria" section describing what good responses look like
+
+RULES:
+- Keep all existing sections exactly as-is — only ADD new sections at the end
+- Keep additions concise and specific — no filler
+- Output ONLY the enhanced full prompt, no commentary`;
+
+  const userMsg = `Original prompt:\n${basePrompt}\n\nUse case context: "${idea}"\nDetected domain: ${context}`;
+
+  const response = await fetch('https://api.x.ai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${_grokKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'grok-3-fast',
+      messages: [
+        { role: 'system', content: systemMsg },
+        { role: 'user',   content: userMsg }
+      ],
+      temperature: 0.4,
+      max_tokens: 1800
+    })
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err?.error?.message || `Grok API error ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content || null;
+}
+
 /* ═══════════════════════════════════════════════════════════════
    QUESTION POOL
 ═══════════════════════════════════════════════════════════════ */
@@ -1128,7 +1401,7 @@ function collectAnswers() {
 }
 
 /* ─── GENERATE PROMPT ───────────────────────────────────────── */
-function generatePrompt() {
+async function generatePrompt() {
   const idea = document.getElementById('ideaInput').value.trim();
   const ans  = collectAnswers();
   const { persona='', audience='', tone='', document:useDocRaw='', domain='',
@@ -1183,7 +1456,37 @@ function generatePrompt() {
     ${docFlag}
     <span>{{HISTORY}} + {{QUESTION}}</span>`;
   document.getElementById('promptOutput').textContent = final;
+  document.getElementById('aiEnhancedBadge').classList.add('hidden');
   showStep(3);
+
+  // ── Grok enhancement (async, non-blocking) ──────────────────
+  if (_grokKey) {
+    const ctx = detectContext(idea);
+    const thinking = document.getElementById('grokThinking');
+    const genBtn   = document.querySelector('#step3Card .btn-cta, #step3Card .btn-primary');
+    thinking.classList.remove('hidden');
+
+    try {
+      const enhanced = await enhancePromptWithGrok(final, idea, ctx);
+      if (enhanced && enhanced.trim()) {
+        document.getElementById('promptOutput').textContent = enhanced;
+        document.getElementById('aiEnhancedBadge').classList.remove('hidden');
+        // Update token count
+        const newTokens = Math.round(enhanced.length / 4);
+        document.getElementById('promptMeta').innerHTML = `
+          <span>~${newTokens} tokens</span>
+          <span>${parts.length}+ sections</span>
+          ${docFlag}
+          <span>{{HISTORY}} + {{QUESTION}}</span>`;
+        showToast('Prompt enhanced with Grok real-world context!');
+      }
+    } catch (err) {
+      console.warn('Grok enhancement failed:', err.message);
+      showToast('Grok enhancement unavailable — showing base prompt.');
+    } finally {
+      thinking.classList.add('hidden');
+    }
+  }
 }
 
 /* ─── COPY / DOWNLOAD ───────────────────────────────────────── */

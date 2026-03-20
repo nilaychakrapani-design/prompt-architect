@@ -704,17 +704,105 @@
     }
 
     /* ─── RESPONSIVE ────────────────────────────────────────────── */
+
+    /* ── Tablet / large phone (≤ 768px) ─────────────────────────── */
     @media (max-width: 768px) {
-      .hero { padding: 44px 20px 32px; }
-      .card { padding: 22px 18px; }
-      .step-connector { width: 28px; }
-      .hero h1 { letter-spacing: -.8px; }
+      /* Layout */
+      .container    { padding: 0 16px 80px; }
+      .hero         { padding: 36px 16px 28px; }
+      .hero p       { font-size: 15px; }
+      .card         { padding: 20px 16px; }
+      .hero h1      { letter-spacing: -.8px; }
+
+      /* Step indicator */
+      .step-connector { width: 22px; }
+      .step-pip       { font-size: 11px; }
+      .step-pip .num  { width: 32px; height: 32px; font-size: 12px; }
+
+      /* Template gallery */
+      .tpl-tabs { gap: 5px; }
+      .tpl-tab  { padding: 5px 11px; font-size: 12px; min-height: 32px; }
+      .tpl-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+
+      /* Grok banner */
+      .grok-banner           { flex-wrap: wrap; gap: 10px; padding: 15px 16px; }
+      .grok-banner-actions   { width: 100%; justify-content: flex-start; }
+      .grok-key-input        { min-width: 0; width: 100%; }
+      .grok-key-form         { width: 100%; }
+
+      /* Prompt output */
+      .prompt-output { font-size: 12px; padding: 16px 14px; max-height: 360px; }
+
+      /* Session / feedback */
+      .session-bar    { gap: 10px; font-size: 12px; padding: 8px 12px; }
+      .feedback-label { width: 100%; margin-bottom: 4px; }
     }
+
+    /* ── Small phone (≤ 480px) ───────────────────────────────────── */
     @media (max-width: 480px) {
-      .btn-row { flex-direction: column; align-items: stretch; }
-      .btn-row .btn { justify-content: center; }
-      .output-toolbar { flex-wrap: wrap; }
-      .output-toolbar .btn { flex: 1 1 calc(50% - 4px); justify-content: center; }
+      /* Buttons */
+      .btn-row                             { flex-direction: column; align-items: stretch; }
+      .btn-row .btn                        { justify-content: center; }
+      .output-toolbar                      { flex-wrap: wrap; }
+      .output-toolbar .btn                 { flex: 1 1 calc(50% - 4px); justify-content: center; }
+
+      /* Hero */
+      .hero { padding: 28px 14px 24px; }
+      .badge { font-size: 10.5px; padding: 4px 10px; }
+
+      /* Step indicator — tighter on very narrow screens */
+      .step-connector { width: 14px; }
+      .steps-overview { gap: 0; }
+      .step-pip       { gap: 5px; }
+
+      /* Cards */
+      .card { padding: 16px 14px; border-radius: var(--radius); }
+
+      /* Template grid — 2-column on small screens */
+      .tpl-grid { grid-template-columns: 1fr 1fr; gap: 7px; }
+      .tpl-card { padding: 11px 12px; }
+      .tpl-card-title { font-size: 12px; }
+      .tpl-card-desc  { font-size: 11px; }
+
+      /* Grok banner */
+      .grok-banner         { padding: 13px 14px; }
+      .grok-banner-title   { font-size: 13px; }
+      .grok-banner-sub     { font-size: 12px; }
+      .grok-banner-icon    { width: 36px; height: 36px; }
+      .grok-banner-icon svg{ width: 18px; height: 18px; }
+
+      /* Grok key form — full width, stacked */
+      .grok-key-form  { flex-direction: column; }
+      .grok-key-input { width: 100%; min-width: 0; }
+      .grok-key-form .btn { width: 100%; justify-content: center; }
+
+      /* font-size ≥ 16px on all inputs prevents iOS auto-zoom */
+      .dyn-input,
+      .dyn-input[type="text"],
+      select.dyn-input,
+      textarea.dyn-input,
+      #ideaInput,
+      .grok-key-input { font-size: 16px; }
+
+      /* Prompt output */
+      .prompt-output   { font-size: 11.5px; padding: 14px 12px; max-height: 300px; }
+      .output-header   { flex-wrap: wrap; gap: 6px; }
+      .output-filename { font-size: 11px; }
+
+      /* Session insight */
+      #sessionInsightWrap { flex-direction: column; align-items: flex-start; gap: 4px; }
+
+      /* Feedback bar */
+      .feedback-bar  { gap: 8px; padding: 12px 14px; }
+      .feedback-btn  { font-size: 12px; padding: 6px 12px; }
+    }
+
+    /* ── Very small (≤ 360px) ────────────────────────────────────── */
+    @media (max-width: 360px) {
+      .container { padding: 0 12px 72px; }
+      .hero { padding: 24px 12px 20px; }
+      .tpl-grid { grid-template-columns: 1fr; }  /* single column */
+      .step-pip .label { display: none; }         /* hide step labels */
     }
   </style>
 </head>

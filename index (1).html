@@ -1,0 +1,1924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prompt Architect — AI Prompt Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #F5F4F1;
+      --bg2:         #EBEBЕ7;
+      --card:        #FFFFFF;
+      --border:      #E2DFD9;
+      --border2:     #C9C5BD;
+      --ink:         #18171A;
+      --ink2:        #3A3840;
+      --muted:       #706D78;
+      --muted2:      #A29FAA;
+      --accent:      #6246EA;
+      --accent-h:    #4F38C7;
+      --accent-lt:   #F3F0FF;
+      --accent-bd:   #D1C7FF;
+      --groq:        #F55036;
+      --groq-lt:     #FFF3F1;
+      --gemini:      #1A73E8;
+      --gemini-lt:   #EEF5FF;
+      --green:       #16A34A;
+      --green-lt:    #F0FDF4;
+      --green-bd:    #BBF7D0;
+      --orange:      #EA580C;
+      --orange-lt:   #FFF7ED;
+      --orange-bd:   #FED7AA;
+      --red:         #DC2626;
+      --red-lt:      #FEF2F2;
+    /* Grok / xAI provider */
+    --grok:        #000000;
+    --grok-lt:     #F4F4F5;
+    --grok-bd:     #D4D4D8;
+      --r:           8px;
+      --r-lg:        14px;
+      --r-xl:        20px;
+      --sh:          0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+      --sh-md:       0 4px 16px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04);
+      --sh-lg:       0 8px 32px rgba(0,0,0,.10), 0 2px 8px rgba(0,0,0,.05);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background: var(--bg); color: var(--ink);
+      min-height: 100vh; line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: sticky; top: 0; z-index: 200;
+      height: 56px; padding: 0 24px;
+      background: rgba(245,244,241,.94);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo { display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink); }
+    .logo-mark {
+      width:32px; height:32px; border-radius:8px;
+      background: linear-gradient(135deg, #6246EA, #4F38C7);
+      display:flex; align-items:center; justify-content:center;
+    }
+    .logo-mark svg { width:16px; height:16px; color:#fff; }
+    .logo-text { font-family:'Syne',sans-serif; font-weight:800; font-size:15px; letter-spacing:-.3px; }
+    .logo-version { font-size:11px; color:var(--muted2); font-weight:500; margin-left:2px; background:var(--accent-lt); padding:2px 6px; border-radius:100px; color:var(--accent); }
+
+    .header-right { display:flex; align-items:center; gap:8px; }
+    .provider-pill {
+      display:flex; align-items:center; gap:6px;
+      padding:5px 12px; border-radius:100px;
+      border:1px solid var(--border); background:var(--card);
+      font-size:12px; font-weight:600; color:var(--muted);
+      cursor:pointer; transition:all 150ms;
+    }
+    .provider-pill:hover { border-color:var(--accent-bd); color:var(--accent); }
+    .provider-pill.live { border-color:var(--green-bd); color:var(--green); background:var(--green-lt); }
+    .provider-dot { width:7px; height:7px; border-radius:50%; background:currentColor; }
+    .provider-dot.pulse { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.35} }
+
+    .icon-btn {
+      width:36px; height:36px; border-radius:var(--r);
+      border:1px solid var(--border); background:var(--card);
+      color:var(--muted); cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      transition:all 150ms;
+    }
+    .icon-btn svg { width:15px; height:15px; }
+    .icon-btn:hover { background:var(--bg2); color:var(--ink); }
+
+    /* ── HERO ── */
+    .hero { max-width:680px; margin:0 auto; padding:52px 24px 36px; text-align:center; }
+    .hero-badge {
+      display:inline-flex; align-items:center; gap:6px;
+      font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+      color:var(--muted); margin-bottom:18px;
+    }
+    .hero-badge::before,.hero-badge::after { content:''; display:block; width:24px; height:1px; background:var(--border2); }
+    h1 {
+      font-family:'Syne',sans-serif;
+      font-size:clamp(28px,5vw,48px);
+      font-weight:800; line-height:1.1; letter-spacing:-1.5px;
+      margin-bottom:14px;
+    }
+    h1 em { font-style:normal; color:var(--accent); }
+    .hero p { font-size:16px; color:var(--muted); line-height:1.8; max-width:480px; margin:0 auto 28px; font-weight:400; }
+
+    /* Step indicator */
+    .steps { display:flex; justify-content:center; align-items:center; margin-bottom:36px; }
+    .step-node { display:flex; flex-direction:column; align-items:center; gap:6px; }
+    .step-circle {
+      width:34px; height:34px; border-radius:50%;
+      border:2px solid var(--border); background:var(--card);
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Syne',sans-serif; font-size:13px; font-weight:700;
+      color:var(--muted2); transition:all 200ms;
+    }
+    .step-lbl { font-size:11px; font-weight:600; color:var(--muted2); }
+    .step-node.active .step-circle { background:var(--accent); border-color:var(--accent); color:#fff; }
+    .step-node.active .step-lbl { color:var(--accent); }
+    .step-node.done .step-circle { background:var(--green); border-color:var(--green); color:#fff; font-size:0; }
+    .step-node.done .step-circle::after { content:'✓'; font-size:13px; font-family:'Plus Jakarta Sans',sans-serif; }
+    .step-node.done .step-lbl { color:var(--green); }
+    .step-line { width:48px; height:2px; background:var(--border); margin:0 4px 20px; border-radius:1px; transition:background 300ms; }
+    .step-line.done { background:var(--accent); }
+
+    /* ── LAYOUT ── */
+    .container { max-width:900px; margin:0 auto; padding:0 24px 100px; }
+
+    /* ── CARD ── */
+    .card {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:var(--r-xl); box-shadow:var(--sh);
+      padding:28px 32px; margin-bottom:14px;
+    }
+    .card-head { display:flex; align-items:flex-start; gap:14px; margin-bottom:24px; }
+    .card-icon {
+      width:42px; height:42px; border-radius:10px;
+      background:linear-gradient(135deg,#6246EA,#4F38C7); flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .card-icon svg { width:19px; height:19px; color:#fff; }
+    .card-icon.blue { background:linear-gradient(135deg,#1A73E8,#1558B0); }
+    .card-icon.green { background:linear-gradient(135deg,#16A34A,#15803D); }
+    .card-title { font-family:'Syne',sans-serif; font-size:17px; font-weight:700; letter-spacing:-.3px; margin-bottom:3px; }
+    .card-sub { font-size:13px; color:var(--muted); line-height:1.6; }
+
+    /* ── PROVIDER SETUP CARD ── */
+    .provider-setup {
+      border-radius:var(--r-xl); padding:0; margin-bottom:14px;
+      overflow:hidden; border:1px solid var(--border);
+      box-shadow:var(--sh-md);
+    }
+
+    /* Provider selector strip */
+    .provider-selector {
+      display:grid; grid-template-columns:1fr 1fr 1fr;
+      border-bottom:1px solid var(--border);
+    }
+    .prov-tab {
+      display:flex; flex-direction:column; align-items:center; gap:10px;
+      padding:22px 20px; cursor:pointer;
+      background:var(--bg); border:none; transition:all 150ms;
+      position:relative;
+    }
+    .prov-tab:not(:last-child) { border-right:1px solid var(--border); }
+    .prov-tab.active { background:var(--card); }
+    .prov-tab.active::after {
+      content:''; position:absolute; bottom:-1px; left:0; right:0; height:2px;
+      background:var(--accent);
+    }
+    .prov-tab-logo {
+      width:44px; height:44px; border-radius:12px;
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Syne',sans-serif; font-size:15px; font-weight:800; color:#fff;
+    }
+    .prov-tab-logo.groq { background:linear-gradient(135deg,#F55036,#D43A23); }
+    .prov-tab-logo.gemini { background:linear-gradient(135deg,#1A73E8,#1558B0); }
+    .prov-tab-info { text-align:center; }
+    .prov-tab-name { font-family:'Syne',sans-serif; font-size:14px; font-weight:700; margin-bottom:2px; }
+    .prov-tab-desc { font-size:11.5px; color:var(--muted); }
+    .prov-tab-badge {
+      font-size:10px; font-weight:700; letter-spacing:.5px; text-transform:uppercase;
+      padding:3px 8px; border-radius:100px;
+    }
+    .prov-tab-badge.free { background:var(--green-lt); color:var(--green); border:1px solid var(--green-bd); }
+
+    .prov-tab-logo.grok-xai { background:linear-gradient(135deg,#000,#333); font-size:17px; }
+    .prov-step-num.grok-xai  { background:var(--grok); }
+    .prov-tab-badge.paid { background:#FFF8E1; color:#B45309; border:1px solid #FDE68A; }
+
+
+    /* Provider body */
+    .provider-body { padding:24px 28px; background:var(--card); }
+    .provider-body-inner { display:none; }
+    .provider-body-inner.active { display:block; }
+
+    .prov-how-title {
+      font-family:'Syne',sans-serif; font-size:13px; font-weight:700;
+      text-transform:uppercase; letter-spacing:.5px; color:var(--muted);
+      margin-bottom:14px; display:flex; align-items:center; gap:6px;
+    }
+    .prov-how-title svg { width:13px; height:13px; }
+
+    .prov-steps { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+    .prov-step { display:flex; gap:12px; align-items:flex-start; }
+    .prov-step-num {
+      width:24px; height:24px; border-radius:50%; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      font-size:11px; font-weight:700; color:#fff; margin-top:1px;
+    }
+    .prov-step-num.groq { background:var(--groq); }
+    .prov-step-num.gemini { background:var(--gemini); }
+    .prov-step-text { font-size:13px; color:var(--ink2); line-height:1.7; }
+    .prov-step-text a { color:var(--accent); text-decoration:none; font-weight:600; }
+    .prov-step-text a:hover { text-decoration:underline; }
+    .prov-step-text code { background:var(--bg); padding:2px 6px; border-radius:4px; font-family:'DM Mono',monospace; font-size:11.5px; color:var(--ink); border:1px solid var(--border); }
+
+    /* Key input */
+    .key-input-wrap { display:flex; gap:8px; flex-wrap:wrap; }
+    .key-input {
+      flex:1; min-width:240px; padding:11px 14px;
+      border-radius:var(--r); border:1.5px solid var(--border);
+      background:var(--bg); color:var(--ink);
+      font-family:'DM Mono',monospace; font-size:13px;
+      outline:none; transition:all 150ms; letter-spacing:.3px;
+    }
+    .key-input:focus { border-color:var(--accent); background:var(--card); box-shadow:0 0 0 3px var(--accent-lt); }
+    .key-input::placeholder { color:var(--muted2); font-family:'Plus Jakarta Sans',sans-serif; font-size:12.5px; letter-spacing:0; }
+
+    /* Connected banner */
+    .connected-banner {
+      display:none; align-items:center; gap:12px;
+      padding:12px 16px; border-radius:var(--r);
+      background:var(--green-lt); border:1px solid var(--green-bd);
+    }
+    .connected-banner.show { display:flex; }
+    .connected-banner-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .connected-banner svg { width:16px; height:16px; }
+    .connected-text { flex:1; }
+    .connected-name { font-size:13px; font-weight:700; color:var(--green); }
+    .connected-sub { font-size:12px; color:var(--muted); }
+    .disconnect-btn { font-size:12px; color:var(--muted); cursor:pointer; text-decoration:underline; background:none; border:none; padding:0; }
+    .disconnect-btn:hover { color:var(--red); }
+
+    /* provider comparison note */
+    .prov-compare {
+      display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:20px;
+    }
+    .prov-compare-card {
+      border-radius:var(--r); padding:12px 14px;
+      border:1.5px solid transparent;
+    }
+    .prov-compare-card.groq { background:var(--groq-lt); border-color:#FCD9D2; }
+    .prov-compare-card.gemini { background:var(--gemini-lt); border-color:#C4DCFF; }
+    .prov-compare-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; margin-bottom:6px; }
+    .prov-compare-card.groq .prov-compare-label { color:var(--groq); }
+    .prov-compare-card.gemini .prov-compare-label { color:var(--gemini); }
+    .prov-compare-list { list-style:none; display:flex; flex-direction:column; gap:4px; }
+    .prov-compare-list li { font-size:11.5px; color:var(--muted); display:flex; gap:6px; }
+    .prov-compare-list li::before { content:'✓'; color:var(--green); font-weight:700; }
+
+    /* ── TIPS ── */
+    .tips-panel {
+      background:var(--accent-lt); border:1px solid var(--accent-bd);
+      border-radius:var(--r-xl); padding:18px 22px; margin-bottom:14px;
+    }
+    .tips-panel h3 { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; color:var(--accent); margin-bottom:10px; display:flex; align-items:center; gap:7px; }
+    .tips-panel h3 svg { width:14px; height:14px; flex-shrink:0; }
+    .tips-panel ul { list-style:none; display:flex; flex-direction:column; gap:7px; }
+    .tips-panel li { font-size:13px; color:var(--muted); display:flex; gap:8px; line-height:1.6; }
+    .tips-panel li::before { content:"→"; color:var(--accent); font-weight:700; flex-shrink:0; }
+    code.tag { background:var(--card); padding:1px 6px; border-radius:4px; font-family:'DM Mono',monospace; font-size:11px; color:var(--accent); border:1px solid var(--accent-bd); }
+
+    /* ── TEMPLATE SECTION ── */
+    /* How-to flow banner */
+    .tpl-flow {
+      background:linear-gradient(135deg,var(--accent-lt),#EDE9FE);
+      border:1.5px solid var(--accent-bd); border-radius:var(--r-lg);
+      padding:16px 18px; margin-bottom:20px;
+      display:flex; flex-direction:column; gap:12px;
+    }
+    .tpl-flow-title {
+      font-family:'Syne',sans-serif; font-size:12.5px; font-weight:700; color:var(--accent);
+      text-transform:uppercase; letter-spacing:.5px;
+      display:flex; align-items:center; gap:7px;
+    }
+    .tpl-flow-title svg { width:14px; height:14px; }
+    .tpl-flow-steps { display:flex; align-items:center; gap:0; flex-wrap:wrap; }
+    .tpl-flow-step {
+      display:flex; align-items:center; gap:7px;
+      background:var(--card); border:1px solid var(--accent-bd);
+      border-radius:100px; padding:6px 12px;
+      font-size:12px; font-weight:600; color:var(--ink2);
+    }
+    .tpl-flow-step-num {
+      width:18px; height:18px; border-radius:50%;
+      background:var(--accent); color:#fff;
+      font-size:10px; font-weight:700;
+      display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    }
+    .tpl-flow-arrow {
+      color:var(--accent-bd); font-size:16px; font-weight:700; padding:0 4px;
+    }
+    .tpl-flow-note { font-size:12px; color:var(--muted); line-height:1.6; }
+
+    /* ── QUICK START SELECTOR ── */
+    .qs-bar {
+      display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap;
+    }
+    .qs-label {
+      font-family:'Syne',sans-serif; font-size:12px; font-weight:700;
+      color:var(--muted); text-transform:uppercase; letter-spacing:.5px; white-space:nowrap;
+    }
+    .qs-select-wrap { position:relative; flex:1; min-width:180px; max-width:280px; }
+    .qs-select-wrap::after {
+      content:''; pointer-events:none;
+      position:absolute; right:12px; top:50%; transform:translateY(-50%);
+      border-left:4px solid transparent; border-right:4px solid transparent;
+      border-top:5px solid var(--muted);
+    }
+    .qs-select {
+      appearance:none; -webkit-appearance:none;
+      width:100%; padding:9px 34px 9px 12px;
+      border:1.5px solid var(--border); border-radius:var(--r);
+      background:var(--card); color:var(--ink);
+      font-family:'Plus Jakarta Sans',sans-serif; font-size:13px; font-weight:600;
+      cursor:pointer; outline:none; transition:border-color 150ms, box-shadow 150ms;
+    }
+    .qs-select:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-lt); }
+
+    .qs-search-wrap { position:relative; flex:1; min-width:140px; }
+    .qs-search-wrap svg {
+      position:absolute; left:10px; top:50%; transform:translateY(-50%);
+      width:14px; height:14px; color:var(--muted2); pointer-events:none;
+    }
+    .qs-search {
+      width:100%; padding:9px 12px 9px 32px;
+      border:1.5px solid var(--border); border-radius:var(--r);
+      background:var(--card); color:var(--ink);
+      font-family:'Plus Jakarta Sans',sans-serif; font-size:13px;
+      outline:none; transition:border-color 150ms, box-shadow 150ms;
+    }
+    .qs-search:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-lt); }
+    .qs-count {
+      font-size:11.5px; font-weight:600; color:var(--muted2);
+      background:var(--bg2); border:1px solid var(--border);
+      padding:4px 10px; border-radius:100px; white-space:nowrap;
+    }
+
+    /* Template list */
+    .tpl-list {
+      display:flex; flex-direction:column; gap:6px; margin-bottom:22px;
+      max-height:340px; overflow-y:auto;
+      border:1px solid var(--border); border-radius:var(--r-lg);
+      padding:6px;
+      scrollbar-width:thin; scrollbar-color:var(--border2) transparent;
+    }
+    .tpl-list::-webkit-scrollbar { width:5px; }
+    .tpl-list::-webkit-scrollbar-track { background:transparent; }
+    .tpl-list::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px; }
+
+    .tpl-row {
+      display:flex; align-items:center; gap:10px;
+      padding:11px 13px; border-radius:var(--r);
+      border:1.5px solid transparent; background:var(--bg);
+      cursor:pointer; text-align:left; transition:all 120ms; width:100%;
+    }
+    .tpl-row:hover { background:var(--card); border-color:var(--accent-bd); }
+    .tpl-row.active { background:var(--accent-lt); border-color:var(--accent); }
+    .tpl-row-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+    .tpl-row-body { flex:1; min-width:0; }
+    .tpl-row-name { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; color:var(--ink); display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .tpl-row-meta { font-size:11.5px; color:var(--muted); display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .tpl-row-dept {
+      font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px;
+      padding:2px 8px; border-radius:100px; background:var(--bg2); color:var(--muted);
+      border:1px solid var(--border); white-space:nowrap; flex-shrink:0;
+    }
+    .tpl-row.active .tpl-row-dept { background:var(--accent-lt); color:var(--accent); border-color:var(--accent-bd); }
+    .tpl-row-arrow { color:var(--muted2); flex-shrink:0; }
+    .tpl-row-arrow svg { width:14px; height:14px; display:block; }
+    .tpl-row.active .tpl-row-arrow { color:var(--accent); }
+
+    .tpl-loaded-badge {
+      display:none; align-items:center; gap:6px; padding:10px 14px;
+      background:var(--accent-lt); border:1.5px solid var(--accent-bd);
+      border-radius:var(--r); font-size:13px; font-weight:600; color:var(--accent);
+      margin-bottom:14px;
+    }
+    .tpl-loaded-badge.show { display:flex; }
+    .tpl-loaded-badge svg { width:14px; height:14px; }
+    .tpl-empty { text-align:center; padding:30px; color:var(--muted); font-size:14px; }
+
+    /* keep old grid classes as no-op so nothing breaks */
+    .dept-tabs,.dept-tab,.tpl-grid,.tpl-card { display:none; }
+
+    /* ── FORM FIELDS ── */
+    .field { margin-bottom:18px; }
+    label { display:block; font-size:13px; font-weight:600; margin-bottom:6px; color:var(--ink2); }
+    .tip { display:block; font-size:12px; font-weight:400; color:var(--muted); margin-top:2px; }
+    textarea, input[type="text"], select {
+      width:100%; padding:11px 14px;
+      border:1.5px solid var(--border); border-radius:var(--r);
+      background:var(--bg); color:var(--ink);
+      font-family:'Plus Jakarta Sans',sans-serif; font-size:14px;
+      outline:none; transition:border-color 150ms, box-shadow 150ms; resize:vertical;
+      line-height:1.6;
+    }
+    textarea:focus, input[type="text"]:focus, select:focus {
+      border-color:var(--accent); background:var(--card);
+      box-shadow:0 0 0 3px var(--accent-lt);
+    }
+    .char-count { font-size:11.5px; color:var(--muted2); text-align:right; margin-top:5px; }
+    .char-count.warn { color:var(--orange); }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 20px; border-radius:var(--r); font-size:14px; font-weight:700;
+      font-family:'Syne',sans-serif; cursor:pointer; border:1.5px solid transparent;
+      transition:all 150ms; white-space:nowrap; text-decoration:none;
+    }
+    .btn svg { width:15px; height:15px; flex-shrink:0; }
+    .btn:disabled { opacity:.5; cursor:not-allowed; }
+    .btn-primary {
+      background:var(--accent); color:#fff; border-color:var(--accent);
+    }
+    .btn-primary:hover:not(:disabled) { background:var(--accent-h); border-color:var(--accent-h); transform:translateY(-1px); box-shadow:0 4px 12px rgba(98,70,234,.3); }
+    .btn-ghost {
+      background:var(--card); color:var(--ink2); border-color:var(--border);
+    }
+    .btn-ghost:hover:not(:disabled) { background:var(--bg2); border-color:var(--border2); }
+    .btn-danger { background:var(--red-lt); color:var(--red); border-color:#FECACA; }
+    .btn-danger:hover { background:#FEE2E2; }
+    .btn-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .btn-spinner {
+      width:14px; height:14px; border-radius:50%;
+      border:2px solid rgba(255,255,255,.3); border-top-color:#fff;
+      animation:spin .7s linear infinite; flex-shrink:0;
+    }
+    @keyframes spin { to{transform:rotate(360deg)} }
+
+    /* ── DYNAMIC QUESTIONS ── */
+    .dyn-q {
+      background:var(--bg); border:1px solid var(--border);
+      border-radius:var(--r-lg); padding:16px 18px; margin-bottom:10px;
+      transition:border-color 150ms;
+    }
+    .dyn-q:focus-within { border-color:var(--accent-bd); }
+    .dyn-q-label { font-size:13px; font-weight:700; color:var(--ink); margin-bottom:4px; display:flex; align-items:center; gap:6px; }
+    .dyn-q-hint { font-size:12px; color:var(--muted); margin-bottom:10px; line-height:1.5; }
+    .dyn-input {
+      width:100%; padding:10px 13px; border-radius:var(--r);
+      border:1.5px solid var(--border); background:var(--card);
+      font-family:'Plus Jakarta Sans',sans-serif; font-size:13.5px; color:var(--ink);
+      outline:none; transition:border-color 150ms, box-shadow 150ms; resize:vertical;
+    }
+    .dyn-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-lt); }
+    .toggle-row {
+      display:flex; align-items:center; gap:9px;
+      font-size:13.5px; color:var(--ink2); cursor:pointer; padding:6px 0;
+    }
+    .toggle-row input[type=checkbox] { width:16px; height:16px; accent-color:var(--accent); flex-shrink:0; }
+    .toggle-row.checked { color:var(--accent); font-weight:600; }
+    .toggle-detail { margin-top:10px; }
+    .q-badge {
+      font-size:10px; font-weight:700; letter-spacing:.4px; text-transform:uppercase;
+      padding:2px 7px; border-radius:100px; background:var(--accent-lt); color:var(--accent);
+    }
+    .prog-bar { height:4px; background:var(--border); border-radius:2px; margin-bottom:6px; overflow:hidden; }
+    .prog-fill { height:100%; background:linear-gradient(90deg,var(--accent),#8B5CF6); border-radius:2px; transition:width 300ms ease; }
+    .prog-lbl { font-size:11.5px; color:var(--muted); margin-bottom:18px; }
+    .q-meta { display:flex; align-items:center; gap:10px; margin-bottom:12px; font-size:13px; color:var(--muted); }
+    .q-tag { background:var(--bg2); border:1px solid var(--border); border-radius:100px; padding:2px 9px; font-size:11px; font-weight:600; color:var(--muted); }
+
+    /* AI bar */
+    .ai-bar {
+      display:flex; align-items:center; gap:8px; padding:9px 13px;
+      border-radius:var(--r); background:linear-gradient(90deg,var(--accent-lt),#EDE9FE);
+      border:1px solid var(--accent-bd); margin-bottom:14px;
+      font-size:13px; font-weight:600; color:var(--accent);
+    }
+    .ai-bar svg { width:14px; height:14px; flex-shrink:0; }
+    .ai-bar.fallback { background:var(--bg2); border-color:var(--border); color:var(--muted); }
+
+    /* Analyzing state */
+    .analyzing { text-align:center; padding:40px 20px; }
+    .analyzing-ring {
+      width:44px; height:44px; border-radius:50%; margin:0 auto 16px;
+      border:3px solid var(--accent-bd); border-top-color:var(--accent);
+      animation:spin .9s linear infinite;
+    }
+    .analyzing h3 { font-family:'Syne',sans-serif; font-size:16px; font-weight:700; margin-bottom:6px; }
+    .analyzing p { font-size:13px; color:var(--muted); }
+
+    /* ── OUTPUT ── */
+    .output-wrap { border-radius:var(--r-lg); overflow:hidden; margin-bottom:14px; }
+    .output-bar {
+      background:#161B22; padding:10px 16px; display:flex; align-items:center; justify-content:space-between;
+    }
+    .traffic { display:flex; gap:6px; }
+    .traffic span { width:12px; height:12px; border-radius:50%; }
+    .traffic span:nth-child(1) { background:#FF5F57; }
+    .traffic span:nth-child(2) { background:#FEBC2E; }
+    .traffic span:nth-child(3) { background:#28C840; }
+    .output-fname { font-family:'DM Mono',monospace; font-size:12px; color:rgba(255,255,255,.5); margin-left:8px; }
+    .prompt-output {
+      background:#0D1117; color:#E6EDF3;
+      font-family:'DM Mono',monospace; font-size:13px; line-height:1.8;
+      padding:24px 26px; white-space:pre-wrap; word-break:break-word;
+      max-height:600px; overflow-y:auto; outline:none;
+    }
+    .prompt-meta { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
+    .prompt-meta span {
+      font-size:11px; font-weight:600; padding:3px 9px;
+      background:var(--bg2); border:1px solid var(--border); border-radius:100px; color:var(--muted);
+    }
+    .output-toolbar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+
+    /* feedback */
+    .fb-bar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .fb-lbl { font-size:12.5px; color:var(--muted); font-weight:500; }
+    .fb-btn {
+      display:flex; align-items:center; gap:5px; padding:6px 12px; border-radius:100px;
+      border:1px solid var(--border); background:var(--card); font-size:12px; font-weight:600;
+      color:var(--muted); cursor:pointer; transition:all 120ms;
+    }
+    .fb-btn svg { width:13px; height:13px; }
+    .fb-btn.good:hover,.fb-btn.good.sel { background:var(--green-lt);border-color:var(--green-bd);color:var(--green); }
+    .fb-btn.bad:hover,.fb-btn.bad.sel { background:var(--red-lt);border-color:#FECACA;color:var(--red); }
+    .fb-btn.redo:hover,.fb-btn.redo.sel { background:var(--orange-lt);border-color:var(--orange-bd);color:var(--orange); }
+
+    /* ── HOW TO USE ── */
+    .how-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(170px,1fr)); gap:9px; }
+    .how-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--r-lg); padding:14px; transition:all 150ms; }
+    .how-card:hover { border-color:var(--accent-bd); background:var(--accent-lt); }
+    .how-icon { margin-bottom:8px; }
+    .how-icon svg { width:19px; height:19px; color:var(--accent); }
+    .how-title { font-family:'Syne',sans-serif; font-size:12.5px; font-weight:700; margin-bottom:3px; }
+    .how-desc { font-size:11.5px; color:var(--muted); line-height:1.6; }
+
+    /* ── MISC ── */
+    hr { border:none; border-top:1px solid var(--border); margin:22px 0; }
+    .section-head { font-family:'Syne',sans-serif; font-size:13.5px; font-weight:700; margin-bottom:13px; }
+    .hidden { display:none !important; }
+
+    /* ── TOAST ── */
+    .toast {
+      position:fixed; bottom:22px; right:22px; z-index:999;
+      background:var(--ink); color:#fff; padding:11px 16px;
+      border-radius:var(--r); font-size:13px; font-weight:600;
+      box-shadow:var(--sh-lg); transform:translateY(72px); opacity:0;
+      transition:transform .3s ease, opacity .3s ease; pointer-events:none;
+      display:flex; align-items:center; gap:8px; max-width:320px;
+    }
+    .toast.show { transform:translateY(0); opacity:1; }
+    .toast svg { width:14px; height:14px; color:#4ADE80; flex-shrink:0; }
+
+
+    /* Grok thinking bar */
+    .grok-think-bar {
+      display:flex; align-items:center; gap:10px;
+      padding:12px 16px; margin-bottom:14px;
+      background:var(--grok-lt); border:1px solid var(--grok-bd);
+      border-radius:var(--r); font-size:13px; font-weight:600; color:var(--ink2);
+    }
+    .grok-think-bar.hidden { display:none !important; }
+
+    /* ── FOOTER ── */
+    footer { text-align:center; font-size:12px; color:var(--muted2); padding:20px; border-top:1px solid var(--border); background:var(--card); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width:768px) {
+      .container { padding:0 16px 80px; }
+      .provider-selector { grid-template-columns:1fr 1fr 1fr; }
+      .prov-tab { padding:14px 8px; }
+      .prov-tab-logo { width:36px; height:36px; font-size:13px; }
+      .prov-tab-name { font-size:12px; }
+      .prov-tab-desc { font-size:10px; }
+      .hero { padding:36px 16px 28px; }
+      .card { padding:20px 18px; }
+      .provider-body { padding:18px; }
+      .step-line { width:24px; }
+      h1 { letter-spacing:-1px; }
+      .prov-compare { grid-template-columns:1fr; }
+    }
+    @media (max-width:480px) {
+      .btn-row { flex-direction:column; align-items:stretch; }
+      .btn-row .btn { justify-content:center; }
+      .tpl-grid { grid-template-columns:1fr 1fr 1fr; }
+      input, textarea, select, .key-input { font-size:16px !important; }
+      .provider-selector { grid-template-columns:1fr 1fr 1fr; }
+      .tpl-flow-steps { gap:4px; }
+      .tpl-flow-step { font-size:11px; padding:5px 9px; }
+    }
+    @media (max-width:360px) {
+      .tpl-grid { grid-template-columns:1fr; }
+      .step-line { width:14px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="toastMsg"></span>
+</div>
+<div id="errRegion" role="alert" aria-live="assertive" style="position:absolute;left:-9999px;"></div>
+
+<!-- HEADER -->
+<header>
+  <a class="logo" href="#" aria-label="Prompt Architect">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>
+      </svg>
+    </div>
+    <span class="logo-text">Prompt Architect</span>
+    <span class="logo-version">v5</span>
+  </a>
+  <div class="header-right">
+    <div class="provider-pill" id="providerPill" onclick="document.getElementById('providerSetup').scrollIntoView({behavior:'smooth'})">
+      <span class="provider-dot" id="providerDot"></span>
+      <span id="providerPillText">Connect AI</span>
+    </div>
+    <button class="icon-btn" onclick="resetAll()" aria-label="Start over" title="Start over">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">Free AI-Powered · No Account Needed</div>
+  <h1>Turn any idea into a<br><em>production-ready prompt</em></h1>
+  <p>Connect a free AI key, pick a department template or describe your use case, and get a structured prompt in under 2 minutes.</p>
+  <div class="steps" role="list">
+    <div class="step-node active" id="pip1" role="listitem">
+      <div class="step-circle">1</div>
+      <span class="step-lbl">Your Idea</span>
+    </div>
+    <div class="step-line" id="line1"></div>
+    <div class="step-node" id="pip2" role="listitem">
+      <div class="step-circle">2</div>
+      <span class="step-lbl">Questions</span>
+    </div>
+    <div class="step-line" id="line2"></div>
+    <div class="step-node" id="pip3" role="listitem">
+      <div class="step-circle">3</div>
+      <span class="step-lbl">Your Prompt</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ── PROVIDER SETUP ── -->
+  <div class="provider-setup" id="providerSetup">
+
+    <!-- Tab strip -->
+    <div class="provider-selector" id="providerSelector">
+      <button class="prov-tab active" id="tab-groq" onclick="selectProvider('groq')" type="button">
+        <div class="prov-tab-logo groq">G</div>
+        <div class="prov-tab-info">
+          <div class="prov-tab-name">Groq</div>
+          <div class="prov-tab-desc">Lightning fast · Llama 3.1</div>
+        </div>
+        <span class="prov-tab-badge free">FREE</span>
+      </button>
+      <button class="prov-tab" id="tab-gemini" onclick="selectProvider('gemini')" type="button">
+        <div class="prov-tab-logo gemini">✦</div>
+        <div class="prov-tab-info">
+          <div class="prov-tab-name">Google Gemini</div>
+          <div class="prov-tab-desc">1500 req/day · Gemini Flash</div>
+        </div>
+        <span class="prov-tab-badge free">FREE</span>
+      </button>
+      <button class="prov-tab" id="tab-grok" onclick="selectProvider('grok')" type="button">
+        <div class="prov-tab-logo grok-xai">𝕏</div>
+        <div class="prov-tab-info">
+          <div class="prov-tab-name">Grok (xAI)</div>
+          <div class="prov-tab-desc">Real-world context · Grok 3</div>
+        </div>
+        <span class="prov-tab-badge paid">PAID</span>
+      </button>
+    </div>
+
+    <!-- Provider bodies -->
+    <div class="provider-body">
+
+      <!-- GROQ BODY -->
+      <div class="provider-body-inner active" id="body-groq">
+        <div class="prov-how-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          How to get your free Groq key
+        </div>
+        <div class="prov-steps">
+          <div class="prov-step">
+            <div class="prov-step-num groq">1</div>
+            <div class="prov-step-text">Go to <a href="https://console.groq.com" target="_blank" rel="noopener">console.groq.com</a> — sign up free, no credit card needed</div>
+          </div>
+          <div class="prov-step">
+            <div class="prov-step-num groq">2</div>
+            <div class="prov-step-text">Click <strong>API Keys</strong> in the left sidebar → click <strong>Create API Key</strong></div>
+          </div>
+          <div class="prov-step">
+            <div class="prov-step-num groq">3</div>
+            <div class="prov-step-text">Copy the key — it starts with <code>gsk_</code></div>
+          </div>
+          <div class="prov-step">
+            <div class="prov-step-num groq">4</div>
+            <div class="prov-step-text">Paste it below and click <strong>Connect</strong>. Your key stays in your browser only.</div>
+          </div>
+        </div>
+        <div class="key-input-wrap" id="keyInputRow-groq">
+          <input type="password" class="key-input" id="apiKeyInput-groq" placeholder="Paste your Groq key here  (gsk_...)" autocomplete="off" />
+          <button class="btn btn-primary" onclick="connectProvider()" type="button" id="connectBtn" style="background:var(--groq);border-color:var(--groq);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            Connect
+          </button>
+        </div>
+        <div class="connected-banner" id="connectedBanner" style="margin-top:12px;">
+          <div class="connected-banner-icon" id="connectedIcon"></div>
+          <div class="connected-text">
+            <div class="connected-name" id="connectedName">Connected</div>
+            <div class="connected-sub" id="connectedSub">AI-powered questions active</div>
+          </div>
+          <button class="disconnect-btn" onclick="disconnectProvider()">Disconnect</button>
+        </div>
+      </div>
+
+      <!-- GEMINI BODY -->
+      <div class="provider-body-inner" id="body-gemini">
+        <div class="prov-how-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          How to get your free Google Gemini key
+        </div>
+        <div class="prov-steps">
+          <div class="prov-step">
+            <div class="prov-step-num gemini">1</div>
+            <div class="prov-step-text">Go to <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com/app/apikey</a> — sign in with any Google account</div>
+          </div>
+          <div class="prov-step">
+            <div class="prov-step-num gemini">2</div>
+            <div class="prov-step-text">Click <strong>Get API key</strong> → <strong>Create API key in new project</strong></div>
+          </div>
+          <div class="prov-step">
+            <div class="prov-step-num gemini">3</div>
+            <div class="prov-step-text">Copy the key — it starts with <code>AIza</code></div>
+          </div>
+          <div class="prov-step">
+            <div class="prov-step-num gemini">4</div>
+            <div class="prov-step-text">Paste it below and click <strong>Connect</strong>. Free tier gives 1,500 requests per day.</div>
+          </div>
+        </div>
+        <div class="key-input-wrap" id="keyInputRow-gemini">
+          <input type="password" class="key-input" id="apiKeyInput-gemini" placeholder="Paste your Gemini key here  (AIza...)" autocomplete="off" />
+          <button class="btn btn-primary" onclick="connectProvider()" type="button" id="connectBtn-gemini" style="background:var(--gemini);border-color:var(--gemini);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            Connect
+          </button>
+        </div>
+        <div class="connected-banner" id="connectedBanner-gemini" style="margin-top:12px;">
+          <div class="connected-banner-icon" id="connectedIcon-gemini"></div>
+          <div class="connected-text">
+            <div class="connected-name" id="connectedName-gemini">Connected</div>
+            <div class="connected-sub" id="connectedSub-gemini">AI-powered questions active</div>
+          </div>
+          <button class="disconnect-btn" onclick="disconnectProvider()">Disconnect</button>
+        </div>
+      </div>
+
+
+      <!-- GROK BODY -->
+      <div class="provider-body-inner" id="body-grok">
+        <div class="prov-how-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          How to get your Grok API key
+        </div>
+        <div class="prov-steps">
+          <div class="prov-step">
+            <div class="prov-step-num grok-xai">1</div>
+            <div class="prov-step-text">Go to <a href="https://console.x.ai" target="_blank" rel="noopener">console.x.ai</a> — sign in with your X (Twitter) account</div>
+          </div>
+          <div class="prov-step">
+            <div class="prov-step-num grok-xai">2</div>
+            <div class="prov-step-text">Navigate to <strong>API Keys</strong> and click <strong>Create API Key</strong></div>
+          </div>
+          <div class="prov-step">
+            <div class="prov-step-num grok-xai">3</div>
+            <div class="prov-step-text">Copy the key — it starts with <code>xai-</code></div>
+          </div>
+          <div class="prov-step">
+            <div class="prov-step-num grok-xai">4</div>
+            <div class="prov-step-text">Paste it below and click <strong>Connect</strong>. Grok enriches your prompts with real-world context and current best practices.</div>
+          </div>
+        </div>
+        <div style="background:var(--grok-lt);border:1px solid var(--grok-bd);border-radius:var(--r);padding:12px 14px;margin-bottom:18px;font-size:12.5px;color:var(--muted);line-height:1.6;">
+          <strong style="color:var(--grok);">✦ What Grok adds:</strong> After your prompt is generated, Grok automatically enriches it with industry context, current best practices, and smart additional rules — making every prompt sharper and more production-ready.
+        </div>
+        <div class="key-input-wrap" id="keyInputRow-grok">
+          <input type="password" class="key-input" id="apiKeyInput-grok" placeholder="Paste your Grok key here  (xai-...)" autocomplete="off" />
+          <button class="btn btn-primary" onclick="connectProvider()" type="button" id="connectBtn-grok" style="background:var(--grok);border-color:var(--grok);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            Connect
+          </button>
+        </div>
+        <div class="connected-banner" id="connectedBanner-grok" style="margin-top:12px;">
+          <div class="connected-banner-icon" id="connectedIcon-grok"></div>
+          <div class="connected-text">
+            <div class="connected-name" id="connectedName-grok">Connected</div>
+            <div class="connected-sub" id="connectedSub-grok">Grok enrichment active — prompts will be AI-enhanced</div>
+          </div>
+          <button class="disconnect-btn" onclick="disconnectProvider()">Disconnect</button>
+        </div>
+      </div>
+
+
+    <!-- ── PROVIDER COMPARE + NO-KEY NOTICE ── -->
+    <div style="border-top:1px solid var(--border);">
+
+      <!-- 3-way comparison table -->
+      <div style="padding:20px 24px 0;">
+        <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted2);margin-bottom:14px;text-align:center;">Which provider is right for you?</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;">
+
+          <!-- Groq card -->
+          <div style="border-radius:var(--r-lg);overflow:hidden;border:1.5px solid #FCD9D2;">
+            <div style="background:var(--groq);padding:10px 12px;display:flex;align-items:center;gap:7px;">
+              <div style="width:26px;height:26px;border-radius:6px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:#fff;">G</div>
+              <div>
+                <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:800;color:#fff;line-height:1.1;">Groq</div>
+                <div style="font-size:10px;color:rgba(255,255,255,.75);">Llama 3.1 · Free</div>
+              </div>
+            </div>
+            <div style="background:var(--groq-lt);padding:12px;">
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <div style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink2);">
+                  <span style="font-size:13px;">⚡</span> <strong>Fastest</strong> responses
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink2);">
+                  <span style="font-size:13px;">🆓</span> Free, no card needed
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink2);">
+                  <span style="font-size:13px;">📦</span> Daily token limits
+                </div>
+                <div style="margin-top:4px;padding:5px 8px;background:rgba(245,80,54,.1);border-radius:6px;font-size:11px;font-weight:700;color:var(--groq);text-align:center;">Best for: getting started fast</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gemini card -->
+          <div style="border-radius:var(--r-lg);overflow:hidden;border:1.5px solid #C4DCFF;">
+            <div style="background:var(--gemini);padding:10px 12px;display:flex;align-items:center;gap:7px;">
+              <div style="width:26px;height:26px;border-radius:6px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;">✦</div>
+              <div>
+                <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:800;color:#fff;line-height:1.1;">Gemini</div>
+                <div style="font-size:10px;color:rgba(255,255,255,.75);">Flash 1.5 · Free</div>
+              </div>
+            </div>
+            <div style="background:var(--gemini-lt);padding:12px;">
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <div style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink2);">
+                  <span style="font-size:13px;">🎯</span> <strong>1,500 req/day</strong> free
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink2);">
+                  <span style="font-size:13px;">🧠</span> Higher quality output
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink2);">
+                  <span style="font-size:13px;">🔑</span> Google account needed
+                </div>
+                <div style="margin-top:4px;padding:5px 8px;background:rgba(26,115,232,.1);border-radius:6px;font-size:11px;font-weight:700;color:var(--gemini);text-align:center;">Best for: daily power users</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grok card -->
+          <div style="border-radius:var(--r-lg);overflow:hidden;border:1.5px solid #D4D4D8;">
+            <div style="background:#111;padding:10px 12px;display:flex;align-items:center;gap:7px;">
+              <div style="width:26px;height:26px;border-radius:6px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;">𝕏</div>
+              <div>
+                <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:800;color:#fff;line-height:1.1;">Grok</div>
+                <div style="font-size:10px;color:rgba(255,255,255,.6);">Grok 3 · Paid</div>
+              </div>
+            </div>
+            <div style="background:var(--grok-lt);padding:12px;">
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <div style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink2);">
+                  <span style="font-size:13px;">🌍</span> Real-world context
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink2);">
+                  <span style="font-size:13px;">✨</span> <strong>Enriches</strong> your prompts
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink2);">
+                  <span style="font-size:13px;">💳</span> Paid plan required
+                </div>
+                <div style="margin-top:4px;padding:5px 8px;background:rgba(0,0,0,.06);border-radius:6px;font-size:11px;font-weight:700;color:#333;text-align:center;">Best for: pro-grade prompts</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- No-key notice -->
+      <div style="display:flex;align-items:flex-start;gap:10px;padding:13px 24px 16px;font-size:12.5px;color:var(--muted);line-height:1.65;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;color:var(--accent);flex-shrink:0;margin-top:2px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span><strong style="color:var(--ink2);">No API key? No problem.</strong> This tool works perfectly without one — you'll still get structured, high-quality prompts instantly. Adding a key unlocks AI-powered questions tailored to your exact input, so the more you use it, the smarter it gets for your specific use cases.</span>
+      </div>
+
+    </div>
+    </div><!-- /provider-body -->
+  </div><!-- /provider-setup -->
+
+  <!-- ── TIPS ── -->
+  <div class="tips-panel">
+    <h3>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Pro tips for better prompts
+    </h3>
+    <ul>
+      <li>Be specific about your audience — <code class="tag">non-technical staff</code> vs. <code class="tag">experienced developers</code> changes everything</li>
+      <li>Add rules like <code class="tag">never discuss pricing</code> or <code class="tag">escalate to <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c7b4b2b7b7a8b5b387a4a8aab7a6a9bee9a4a8aa">[email&#160;protected]</a></code> when needed</li>
+      <li>The generated prompt uses <code class="tag">{{PLACEHOLDERS}}</code> — replace these with actual content before deploying</li>
+    </ul>
+  </div>
+
+  <!-- ── STEP 1 ── -->
+  <div class="card" id="step1Card">
+    <div class="card-head">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      </div>
+      <div>
+        <div class="card-title">Step 1 — Describe your idea</div>
+        <div class="card-sub">Start from a department template (quickest) or write your own idea below.</div>
+      </div>
+    </div>
+
+    <!-- ── TEMPLATE SECTION ── -->
+    <div style="margin-bottom:24px;">
+
+      <!-- How templates work — visual flow -->
+      <div class="tpl-flow">
+        <div class="tpl-flow-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5"/></svg>
+          How to use a template
+        </div>
+        <div class="tpl-flow-steps">
+          <div class="tpl-flow-step">
+            <div class="tpl-flow-step-num">1</div>
+            Pick your department below
+          </div>
+          <div class="tpl-flow-arrow">→</div>
+          <div class="tpl-flow-step">
+            <div class="tpl-flow-step-num">2</div>
+            Click any template card
+          </div>
+          <div class="tpl-flow-arrow">→</div>
+          <div class="tpl-flow-step">
+            <div class="tpl-flow-step-num">3</div>
+            Click "Analyse &amp; Get Questions"
+          </div>
+          <div class="tpl-flow-arrow">→</div>
+          <div class="tpl-flow-step">
+            <div class="tpl-flow-step-num">4</div>
+            Answer &amp; generate ✓
+          </div>
+        </div>
+        <div class="tpl-flow-note">💡 <strong>Don't see your department?</strong> Skip templates and type your own idea in the text box — it works for any use case.</div>
+      </div>
+
+      <!-- Quick Start by Department -->
+      <div class="qs-bar">
+        <span class="qs-label">Quick Start</span>
+        <div class="qs-select-wrap">
+          <select class="qs-select" id="deptSelect" onchange="filterTemplates(this.value)" aria-label="Filter by department"></select>
+        </div>
+        <div class="qs-search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="qs-search" id="tplSearch" placeholder="Search templates…" oninput="renderTemplateList()" aria-label="Search templates" />
+        </div>
+        <span class="qs-count" id="tplCountBadge"></span>
+      </div>
+
+      <!-- Loaded indicator -->
+      <div class="tpl-loaded-badge" id="tplLoadedBadge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span id="tplLoadedText">Template loaded — review the text below, then click Analyse.</span>
+      </div>
+
+      <div class="tpl-list" id="tplList" role="listbox" aria-label="Department templates"></div>
+    </div>
+
+    <hr style="margin:0 0 22px;" />
+
+    <div class="field">
+      <label for="ideaInput">
+        Or write your own idea
+        <span class="tip">Describe the task, who it helps, and any special context. More detail → better questions.</span>
+      </label>
+      <textarea id="ideaInput" placeholder="Example: I want an AI that helps our HR team answer employee questions about leave policies, benefits, and onboarding procedures. It should follow our HR handbook and escalate sensitive issues to the HR manager..." oninput="onIdeaInput()" style="min-height:140px;" aria-required="true" aria-describedby="ideaCount"></textarea>
+      <div class="char-count" id="ideaCount">0 / 5000</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goToStep2()" id="step1Btn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Analyse &amp; Get Questions
+      </button>
+    </div>
+  </div>
+
+  <!-- ── STEP 2 ── -->
+  <div class="card hidden" id="step2Card">
+    <div class="card-head">
+      <div class="card-icon blue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <div>
+        <div class="card-title" id="step2Title">Questions for your prompt</div>
+        <div class="card-sub" id="step2Sub">Based on your idea, here are the most relevant questions.</div>
+      </div>
+    </div>
+
+    <div class="analyzing" id="analyzingState" role="status" aria-live="polite">
+      <div class="analyzing-ring"></div>
+      <h3 id="analyzingMsg">Analysing your idea…</h3>
+      <p id="analyzingSub">Figuring out the best questions for your use case.</p>
+    </div>
+
+    <div class="hidden" id="questionsWrap">
+      <div class="ai-bar" id="aiMethodBar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
+        <span id="aiMethodText">Questions generated by AI</span>
+      </div>
+      <div class="q-meta">
+        <span><strong id="qCount">0</strong> targeted questions</span>
+        <span class="q-tag" id="qCtxTag"></span>
+      </div>
+      <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+      <div class="prog-lbl" id="progLbl">Fill in what you know — skip anything that doesn't apply.</div>
+      <div id="dynQuestions"></div>
+      <hr />
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="generatePrompt()" type="button" id="genBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          Generate My Prompt
+        </button>
+        <button class="btn btn-ghost" onclick="showStep(1)" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Back
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 3 ── -->
+  <div class="card hidden" id="step3Card">
+    <div class="card-head">
+      <div class="card-icon green">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div>
+        <div class="card-title">Your Structured Prompt</div>
+        <div class="card-sub">Copy and paste directly into Claude's system prompt field, or use via API.</div>
+      </div>
+    </div>
+
+    <div class="prompt-meta" id="promptMeta"></div>
+
+    <div class="output-wrap">
+      <div class="output-bar">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="traffic"><span></span><span></span><span></span></div>
+          <span class="output-fname">system_prompt.txt</span>
+        </div>
+        <span style="font-size:10px;color:rgba(255,255,255,.25);font-family:'DM Mono',monospace;" id="outputProviderTag">Prompt Architect v5</span>
+      </div>
+      <pre class="prompt-output" id="promptOutput" tabindex="0"></pre>
+    </div>
+
+    <div class="output-toolbar">
+      <button class="btn btn-primary" id="copyBtn" onclick="copyPrompt()" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy Prompt
+      </button>
+      <button class="btn btn-ghost" onclick="downloadPrompt()" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download .txt
+      </button>
+      <button class="btn btn-ghost" onclick="showStep(2)" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Edit Answers
+      </button>
+      <button class="btn btn-ghost" onclick="resetAll()" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Prompt
+      </button>
+    </div>
+
+    <div class="fb-bar">
+      <span class="fb-lbl">Was this useful?</span>
+      <button class="fb-btn good" id="fb-good" onclick="submitFeedback('good')" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/></svg>
+        Helpful
+      </button>
+      <button class="fb-btn bad" id="fb-bad" onclick="submitFeedback('bad')" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/></svg>
+        Needs work
+      </button>
+      <button class="fb-btn redo" id="fb-redo" onclick="submitFeedback('redo')" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>
+        Improve it
+      </button>
+    </div>
+
+    <hr />
+    <div class="section-head">How to use this prompt</div>
+    <div class="how-grid">
+      <div class="how-card">
+        <div class="how-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <div class="how-title">Claude.ai</div>
+        <div class="how-desc">Open a new chat → click the sliders icon → paste in the System Prompt field.</div>
+      </div>
+      <div class="how-card">
+        <div class="how-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+        <div class="how-title">API / Code</div>
+        <div class="how-desc">Pass this as the <code style="font-family:'DM Mono',monospace;font-size:11px;">system</code> parameter in your API call.</div>
+      </div>
+      <div class="how-card">
+        <div class="how-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+        <div class="how-title">Replace Placeholders</div>
+        <div class="how-desc">Swap <code style="font-family:'DM Mono',monospace;font-size:11px;">{{HISTORY}}</code> and <code style="font-family:'DM Mono',monospace;font-size:11px;">{{QUESTION}}</code> with actual conversation content.</div>
+      </div>
+      <div class="how-card">
+        <div class="how-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+        <div class="how-title">Customise</div>
+        <div class="how-desc">Edit the sections to add company-specific rules, tone, or document references.</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<footer>Prompt Architect v5 · Keys stay in your browser · Never stored or transmitted</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+/* ══════════════════════════════════════════════════════
+   PROVIDER CONFIG
+══════════════════════════════════════════════════════ */
+const PROVIDER_CONFIG = {
+  groq: {
+    name: 'Groq',
+    color: '#F55036',
+    prefix: 'gsk_',
+    endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+    authHeader: k => ({ 'Content-Type':'application/json', 'Authorization':`Bearer ${k}` }),
+    buildBody: (msgs, max) => JSON.stringify({ model:'llama-3.1-8b-instant', messages:msgs, max_tokens:max }),
+    extractText: d => d.choices?.[0]?.message?.content ?? '',
+  },
+  grok: {
+    name: 'Grok',
+    color: '#000000',
+    prefix: 'xai-',
+    endpoint: 'https://api.x.ai/v1/chat/completions',
+    authHeader: k => ({ 'Content-Type':'application/json', 'Authorization':`Bearer ${k}` }),
+    buildBody: (msgs, max) => JSON.stringify({ model:'grok-3-fast', messages:msgs, max_tokens:max, temperature:0.4 }),
+    extractText: d => d.choices?.[0]?.message?.content ?? '',
+  },
+  gemini: {
+    name: 'Google Gemini',
+    color: '#1A73E8',
+    prefix: 'AIza',
+    endpoint: k => `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${k}`,
+    authHeader: () => ({ 'Content-Type':'application/json' }),
+    buildBody: (msgs, max) => {
+      const sys = msgs.find(m=>m.role==='system')?.content || '';
+      const user = msgs.find(m=>m.role==='user')?.content || '';
+      return JSON.stringify({
+        system_instruction: { parts:[{ text:sys }] },
+        contents: [{ role:'user', parts:[{ text:user }] }],
+        generationConfig: { maxOutputTokens: max },
+      });
+    },
+    extractText: d => d.candidates?.[0]?.content?.parts?.[0]?.text ?? '',
+  },
+};
+
+let _provider = 'groq';
+let _apiKey   = null;
+let _lastQs   = [];
+
+/* ══════════════════════════════════════════════════════
+   STEP NAVIGATION
+══════════════════════════════════════════════════════ */
+function showStep(n) {
+  ['step1Card','step2Card','step3Card'].forEach((id,i)=>{
+    document.getElementById(id).classList.toggle('hidden', i+1 !== n);
+  });
+  ['pip1','pip2','pip3'].forEach((id,i)=>{
+    const el=document.getElementById(id);
+    el.classList.toggle('active', i+1===n);
+    el.classList.toggle('done', i+1<n);
+  });
+  ['line1','line2'].forEach((id,i)=>{
+    document.getElementById(id).classList.toggle('done', i+1<n);
+  });
+  if(n>1) document.getElementById(n===2?'step2Card':'step3Card').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* ══════════════════════════════════════════════════════
+   PROVIDER SELECTION & CONNECTION
+══════════════════════════════════════════════════════ */
+function selectProvider(p) {
+  _provider = p;
+  // Update tab UI
+  ['groq','gemini','grok'].forEach(id => {
+    document.getElementById(`tab-${id}`)?.classList.toggle('active', id===p);
+    document.getElementById(`body-${id}`)?.classList.toggle('active', id===p);
+  });
+}
+
+function getActiveInput() {
+  return document.getElementById(`apiKeyInput-${_provider}`);
+}
+function getActiveConnectBtn() {
+  return document.getElementById(_provider==='groq'?'connectBtn':_provider==='gemini'?'connectBtn-gemini':'connectBtn-grok');
+}
+function getActiveBanner() {
+  return document.getElementById(_provider==='groq'?'connectedBanner':_provider==='gemini'?'connectedBanner-gemini':'connectedBanner-grok');
+}
+function getActiveKeyRow() {
+  return document.getElementById(`keyInputRow-${_provider}`);
+}
+
+async function connectProvider() {
+  const rawKey = getActiveInput()?.value || '';
+  const key    = rawKey.trim();
+  const cfg    = PROVIDER_CONFIG[_provider];
+
+  if (!key) { showToast('Please paste your API key first.'); getActiveInput()?.focus(); return; }
+  if (!key.startsWith(cfg.prefix)) {
+    showToast(`${cfg.name} keys start with "${cfg.prefix}" — please check and try again.`);
+    getActiveInput()?.focus();
+    return;
+  }
+
+  const btn = getActiveConnectBtn();
+  btn.disabled = true;
+  btn.innerHTML = `<div class="btn-spinner"></div> Verifying…`;
+
+  try {
+    const endpoint = typeof cfg.endpoint === 'function' ? cfg.endpoint(key) : cfg.endpoint;
+    const headers  = cfg.authHeader(key);
+    const body     = cfg.buildBody(
+      [{ role:'system', content:'You are helpful.' }, { role:'user', content:'Say: ready' }], 10
+    );
+    const res = await fetch(endpoint, { method:'POST', headers, body });
+
+    if (!res.ok) {
+      let errMsg = `HTTP ${res.status}`;
+      try { const d=await res.json(); errMsg=d?.error?.message||d?.message||errMsg; } catch(_) {}
+      throw new Error(errMsg);
+    }
+
+    const data = await res.json();
+    cfg.extractText(data); // just ensure it parses
+
+    _apiKey = key;
+    setConnected(true);
+    showToast(`${cfg.name} connected! AI questions are now active.`);
+  } catch(err) {
+    console.error('Connect error:', err);
+    const e = err.message || '';
+    let msg;
+    if (e.includes('401')||e.includes('403')||e.includes('invalid')||e.includes('Invalid')||e.includes('API_KEY')) {
+      msg = `Invalid API key — double-check your ${cfg.name} key.`;
+    } else if (e.includes('429')||e.includes('quota')||e.includes('rate')) {
+      msg = `Rate limit reached — wait a moment and try again.`;
+    } else if (e.includes('Failed to fetch')||e.includes('NetworkError')||e.includes('CORS')) {
+      msg = `Network error — check your internet connection.`;
+    } else {
+      msg = `Could not connect: ${e.slice(0,80)}`;
+    }
+    showToast(msg);
+    btn.disabled = false;
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Connect`;
+  }
+}
+
+function setConnected(on) {
+  const cfg    = PROVIDER_CONFIG[_provider];
+  const banner = getActiveBanner();
+  const keyRow = getActiveKeyRow();
+  const pill   = document.getElementById('providerPill');
+  const dot    = document.getElementById('providerDot');
+  const pillTx = document.getElementById('providerPillText');
+
+  if (on) {
+    keyRow?.classList.add('hidden');
+    if (banner) banner.classList.add('show');
+    const nameEl  = banner?.querySelector('.connected-name');
+    const subEl   = banner?.querySelector('.connected-sub');
+    const iconEl  = banner?.querySelector('.connected-banner-icon');
+    if (nameEl)  nameEl.textContent  = `${cfg.name} connected ✓`;
+    if (subEl)   subEl.textContent   = 'AI-powered questions are now active';
+    if (iconEl) { iconEl.style.background=cfg.color; iconEl.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><polyline points="20 6 9 17 4 12"/></svg>`; }
+    pill.classList.add('live');
+    pillTx.textContent = `${cfg.name} Live`;
+    dot.classList.add('pulse');
+    document.getElementById('outputProviderTag').textContent = `Generated by ${cfg.name}`;
+  } else {
+    _apiKey = null;
+    keyRow?.classList.remove('hidden');
+    getActiveBanner()?.classList.remove('show');
+    pill.classList.remove('live');
+    pillTx.textContent = 'Connect AI';
+    dot.classList.remove('pulse');
+    const btn = getActiveConnectBtn();
+    if (btn) { btn.disabled=false; btn.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Connect`; }
+    const inp = getActiveInput(); if(inp) inp.value='';
+    document.getElementById('outputProviderTag').textContent = 'Prompt Architect v5';
+  }
+}
+
+function disconnectProvider() { setConnected(false); showToast('Disconnected.'); }
+
+/* ══════════════════════════════════════════════════════
+   AI CALLS
+══════════════════════════════════════════════════════ */
+async function callAI(systemMsg, userMsg, maxTokens = 1200) {
+  const cfg      = PROVIDER_CONFIG[_provider];
+  const endpoint = typeof cfg.endpoint === 'function' ? cfg.endpoint(_apiKey) : cfg.endpoint;
+  const headers  = cfg.authHeader(_apiKey);
+  const msgs     = [{ role:'system', content: systemMsg }, { role:'user', content: userMsg }];
+  const body     = cfg.buildBody(msgs, maxTokens);
+  const res = await fetch(endpoint, { method:'POST', headers, body });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.error?.message || `HTTP ${res.status}`);
+  }
+  const data = await res.json();
+  return cfg.extractText(data);
+}
+
+async function generateQuestionsWithAI(idea) {
+  const sys = `You are an expert prompt engineer. Analyse the user's idea and return ONLY a JSON array of 3–7 targeted questions.
+
+Each object must have:
+- id: camelCase string
+- label: short title
+- hint: one sentence on why it matters
+- type: "text" | "textarea" | "select" | "toggle_text"
+- placeholder: example answer (for text/textarea/toggle_text)
+- options: string array (ONLY for select)
+- toggleLabel: checkbox label (ONLY for toggle_text)
+
+Rules:
+- Focus on what is UNIQUE and MISSING for this specific use case
+- For human-facing AIs include persona + tone questions
+- For data/code tools skip persona
+- Always include a constraints/rules question
+- Return ONLY valid JSON array. No markdown, no commentary.`;
+
+  const raw = await callAI(sys, `User's idea: "${idea}"\n\nGenerate targeted questions as JSON array.`, 1200);
+  const clean = raw.replace(/```json|```/g, '').trim();
+  return JSON.parse(clean);
+}
+
+async function generatePromptWithAI(idea, answersStr) {
+  const sys = `You are an expert prompt engineer specialising in writing Claude AI system prompts. Write structured, production-ready prompts with clearly labelled sections. Include {{PLACEHOLDER}} variables for dynamic content.`;
+  const user = `Write a complete system prompt for this AI assistant:
+
+IDEA: ${idea}
+
+DETAILS:
+${answersStr || '(none — use best judgment)'}
+
+Include:
+- [Context] — role, goal, audience
+- [Rules] — specific constraints
+- [Format] — output format
+- {{HISTORY}} and {{QUESTION}} placeholders
+- A chain-of-thought instruction at the end
+
+Output ONLY the system prompt. No commentary.`;
+  return await callAI(sys, user, 2000);
+}
+
+
+/* ══════════════════════════════════════════════════════
+   GROK ENRICHMENT (runs after base prompt is generated)
+══════════════════════════════════════════════════════ */
+async function enrichWithGrok(basePrompt, idea, context) {
+  const cfg = PROVIDER_CONFIG['grok'];
+  const endpoint = cfg.endpoint;
+  const headers  = cfg.authHeader(_apiKey);
+  const systemMsg = `You are an expert prompt engineer. A structured AI system prompt has been generated. Your job is to ENHANCE it by appending:
+1. [Industry Context] — 2-3 current real-world facts or best practices relevant to this use case
+2. [Smart Additions] — up to 3 additional constraints that experts in this domain typically include
+3. [Success Criteria] — what excellent responses look like for this use case
+
+RULES:
+- Keep all existing sections exactly as written — only ADD new sections at the end
+- Be concise and specific — no filler
+- Output ONLY the full enhanced prompt. No commentary.`;
+  const body = cfg.buildBody([
+    { role:'system', content: systemMsg },
+    { role:'user', content: `Prompt to enhance:\n${basePrompt}\n\nUse case: "${idea}"\nContext: ${context}` }
+  ], 1600);
+  const res = await fetch(endpoint, { method:'POST', headers, body });
+  if (!res.ok) { const e=await res.json().catch(()=>({})); throw new Error(e?.error?.message||`Grok ${res.status}`); }
+  const data = await res.json();
+  return cfg.extractText(data);
+}
+
+/* ══════════════════════════════════════════════════════
+   FALLBACK QUESTION POOL
+══════════════════════════════════════════════════════ */
+const Q_POOL = [
+  { id:'persona', label:'AI Persona & Role', hint:'A named character makes responses more consistent.', type:'text', placeholder:'e.g. Alex, Support Specialist at TechCorp', keywords:['chatbot','assistant','agent','coach','advisor','support','tutor','customer service'], anti:['code','pipeline','parse','sql'], base:0 },
+  { id:'audience', label:'Target Audience', hint:'Their background shapes vocabulary and depth.', type:'text', placeholder:'e.g. Non-technical customers, or junior marketers', keywords:['write','content','blog','email','marketing','customer','student'], anti:['pipeline','data processing'], base:0 },
+  { id:'tone', label:'Tone & Style', hint:'Important for human-facing AIs.', type:'select', options:['Friendly & casual','Professional & formal','Warm & empathetic','Direct & concise','Expert & authoritative','Playful & creative'], keywords:['customer','user','chat','support','marketing','audience'], anti:['parse','code','pipeline'], base:0 },
+  { id:'document', label:'Reference Documents', hint:"We'll add a {{DOCUMENT}} placeholder.", type:'toggle_text', toggleLabel:'Yes — reference specific documents or data', placeholder:'e.g. refund policy, HR handbook, product catalogue', keywords:['document','knowledge base','faq','policy','catalogue'], anti:[], base:1 },
+  { id:'constraints', label:'Rules & Constraints', hint:'Hard rules make your prompt airtight.', type:'textarea', placeholder:"Never discuss competitor pricing\nAlways add a disclaimer\nEscalate issues to support@company.com", keywords:[], anti:[], base:2 },
+  { id:'format', label:'Output Format', hint:'Affects readability and downstream use.', type:'select', options:['Plain paragraphs','Bullet points / lists','Numbered steps','Markdown (headers, bold, code blocks)','JSON output','Short & direct (1-2 sentences)'], keywords:[], anti:[], base:3 },
+  { id:'length', label:'Response Length', hint:'Calibrates verbosity.', type:'select', options:['Very brief (1-2 sentences)','Short (1 paragraph)','Medium (2-4 paragraphs)','Detailed & comprehensive','Adaptive'], keywords:['write','essay','article','detailed'], anti:[], base:0 },
+  { id:'escalation', label:'Fallback & Escalation', hint:"What happens when it can't answer?", type:'text', placeholder:"e.g. Say 'I'm not sure — please email support@company.com'", keywords:['support','chatbot','agent','escalate','helpdesk'], anti:['code','pipeline'], base:0 },
+];
+
+function scoreQ(q, idea) {
+  const t = idea.toLowerCase(); let s = q.base;
+  q.keywords.forEach(kw => { if(t.includes(kw)) s+=2; });
+  q.anti.forEach(kw => { if(t.includes(kw)) s-=3; });
+  return Math.max(0, s);
+}
+function getFallbackQs(idea) {
+  const scored = Q_POOL.map(q=>({...q, score:scoreQ(q,idea)})).filter(q=>q.score>=2);
+  const fmt = scored.find(q=>q.id==='format');
+  const rest = scored.filter(q=>q.id!=='format').sort((a,b)=>b.score-a.score).slice(0,6);
+  if(fmt) rest.push(fmt);
+  return rest;
+}
+function detectContext(idea) {
+  const t = idea.toLowerCase();
+  if(/chatbot|support|customer service|helpdesk/.test(t)) return 'Support Agent';
+  if(/hr|human resource|employee|onboard|leave|payroll/.test(t)) return 'HR Assistant';
+  if(/sales|outreach|lead|crm|pipeline/.test(t)) return 'Sales Tool';
+  if(/content|blog|article|newsletter|copywriting/.test(t)) return 'Content Tool';
+  if(/code|developer|review|debug|refactor/.test(t)) return 'Developer Tool';
+  if(/legal|compliance|contract|policy/.test(t)) return 'Legal Tool';
+  if(/finance|accounting|invoice|budget/.test(t)) return 'Finance Tool';
+  if(/marketing|campaign|ad|social media/.test(t)) return 'Marketing Tool';
+  if(/product|design|ux|roadmap/.test(t)) return 'Product Tool';
+  if(/data|analys|sql|pipeline/.test(t)) return 'Data Tool';
+  return 'AI Assistant';
+}
+
+/* ══════════════════════════════════════════════════════
+   RENDER QUESTIONS
+══════════════════════════════════════════════════════ */
+function renderQuestions(qs, idea, usedAI) {
+  const container = document.getElementById('dynQuestions');
+  container.innerHTML = '';
+  const ctx = detectContext(idea);
+  document.getElementById('qCount').textContent = qs.length;
+  document.getElementById('qCtxTag').textContent = ctx;
+  document.getElementById('step2Title').textContent = `${qs.length} questions for your prompt`;
+  document.getElementById('step2Sub').textContent = `Detected: ${ctx} — only the most relevant questions shown.`;
+
+  const bar = document.getElementById('aiMethodBar');
+  const txt = document.getElementById('aiMethodText');
+  if(usedAI) {
+    bar.className = 'ai-bar';
+    txt.textContent = `✦ Questions tailored by ${PROVIDER_CONFIG[_provider].name} for your specific idea`;
+  } else {
+    bar.className = 'ai-bar fallback';
+    txt.textContent = 'Using rule-based questions — connect Groq or Gemini for AI-tailored questions';
+  }
+
+  qs.forEach((q,i) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'dyn-q'; wrap.dataset.qid = q.id;
+    let inp = '';
+    if(q.type==='text') {
+      inp = `<input type="text" id="dq_${q.id}" class="dyn-input" placeholder="${esc(q.placeholder||'')}" oninput="updateProg()" aria-label="${esc(q.label)}" />`;
+    } else if(q.type==='textarea') {
+      inp = `<textarea id="dq_${q.id}" class="dyn-input" placeholder="${esc(q.placeholder||'')}" rows="4" oninput="updateProg()" aria-label="${esc(q.label)}"></textarea>`;
+    } else if(q.type==='select') {
+      const opts = (q.options||[]).map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join('');
+      inp = `<select id="dq_${q.id}" class="dyn-input" onchange="updateProg()" aria-label="${esc(q.label)}"><option value="">— Select —</option>${opts}</select>`;
+    } else if(q.type==='toggle_text') {
+      inp = `
+        <label class="toggle-row" id="dq_${q.id}_row">
+          <input type="checkbox" id="dq_${q.id}_chk" onchange="toggleDetail('${q.id}')" />
+          ${esc(q.toggleLabel||q.label)}
+        </label>
+        <div class="toggle-detail hidden" id="dq_${q.id}_detail">
+          <input type="text" id="dq_${q.id}" class="dyn-input" placeholder="${esc(q.placeholder||'')}" oninput="updateProg()" />
+        </div>`;
+    }
+    wrap.innerHTML = `
+      <div class="dyn-q-label">${esc(q.label)} <span class="q-badge">Q${i+1}</span></div>
+      <div class="dyn-q-hint">${esc(q.hint||'')}</div>
+      ${inp}`;
+    container.appendChild(wrap);
+  });
+  updateProg();
+  document.getElementById('analyzingState').classList.add('hidden');
+  document.getElementById('questionsWrap').classList.remove('hidden');
+}
+
+function toggleDetail(id) {
+  const chk = document.getElementById(`dq_${id}_chk`);
+  const det = document.getElementById(`dq_${id}_detail`);
+  const row = document.getElementById(`dq_${id}_row`);
+  if(det) det.classList.toggle('hidden', !chk.checked);
+  if(row) row.classList.toggle('checked', chk.checked);
+  updateProg();
+}
+
+function updateProg() {
+  const qs = _lastQs; if(!qs.length) return;
+  let filled = 0;
+  qs.forEach(q => {
+    if(q.type==='toggle_text') {
+      const chk = document.getElementById(`dq_${q.id}_chk`);
+      if(chk?.checked) { const v=document.getElementById(`dq_${q.id}`)?.value||''; if(v.trim()) filled++; else filled+=.5; }
+    } else {
+      const v = document.getElementById(`dq_${q.id}`)?.value||''; if(v.trim()) filled++;
+    }
+  });
+  const pct = Math.round((filled/qs.length)*100);
+  document.getElementById('progFill').style.width = `${Math.min(pct,100)}%`;
+  document.getElementById('progLbl').textContent = pct>=80?'Looking great — ready to generate your prompt!':pct>=40?`${Math.round(qs.length-filled)} more answers would improve quality.`:'Fill in what you know — skip anything that doesn\'t apply.';
+}
+
+function collectAnswers() {
+  const ans = {};
+  _lastQs.forEach(q => {
+    if(q.type==='toggle_text') {
+      const chk = document.getElementById(`dq_${q.id}_chk`);
+      if(chk?.checked) { ans[q.id]=document.getElementById(`dq_${q.id}`)?.value||''; }
+    } else {
+      ans[q.id] = document.getElementById(`dq_${q.id}`)?.value||'';
+    }
+  });
+  return ans;
+}
+
+/* ══════════════════════════════════════════════════════
+   STEP 2 — ANALYSE
+══════════════════════════════════════════════════════ */
+async function goToStep2() {
+  const idea = document.getElementById('ideaInput').value.trim();
+  if(!idea) { showToast('Please describe your idea first.'); document.getElementById('ideaInput').focus(); return; }
+
+  document.getElementById('step1Btn').disabled = true;
+  document.getElementById('step1Btn').innerHTML = `<div class="btn-spinner"></div> Analysing…`;
+
+  showStep(2);
+  document.getElementById('analyzingState').classList.remove('hidden');
+  document.getElementById('questionsWrap').classList.add('hidden');
+  document.getElementById('analyzingMsg').textContent = _apiKey ? `Generating questions with ${PROVIDER_CONFIG[_provider].name}…` : 'Analysing your idea…';
+  document.getElementById('analyzingSub').textContent = _apiKey ? 'Asking AI to tailor questions for your specific use case.' : 'Figuring out the most relevant questions.';
+
+  let qs, usedAI = false;
+  try {
+    if(_apiKey) { qs = await generateQuestionsWithAI(idea); usedAI = true; }
+    else { qs = getFallbackQs(idea); }
+  } catch(err) {
+    console.warn('AI failed, using fallback:', err);
+    qs = getFallbackQs(idea);
+    showToast('AI question generation failed — using rule-based fallback.');
+  }
+  if(!qs?.length) qs = getFallbackQs(idea);
+  _lastQs = qs;
+  renderQuestions(qs, idea, usedAI);
+
+  if(window._tplAnswers) { applyTplAnswers(window._tplAnswers, qs); window._tplAnswers = null; }
+
+  document.getElementById('step1Btn').disabled = false;
+  document.getElementById('step1Btn').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Analyse &amp; Get Questions`;
+}
+
+/* ══════════════════════════════════════════════════════
+   STEP 3 — GENERATE PROMPT
+══════════════════════════════════════════════════════ */
+async function generatePrompt() {
+  const idea = document.getElementById('ideaInput').value.trim();
+  const ans  = collectAnswers();
+
+  document.getElementById('genBtn').disabled = true;
+  document.getElementById('genBtn').innerHTML = `<div class="btn-spinner"></div> Generating…`;
+
+  let promptText;
+  try {
+    if(_apiKey) {
+      const answersStr = Object.entries(ans).filter(([,v])=>v.trim()).map(([k,v])=>`${k}: ${v}`).join('\n');
+      document.getElementById('analyzingMsg').textContent = `Writing your prompt with ${PROVIDER_CONFIG[_provider].name}…`;
+      document.getElementById('analyzingSub').textContent = 'Crafting a production-ready system prompt.';
+      promptText = await generatePromptWithAI(idea, answersStr);
+    } else {
+      promptText = buildFallbackPrompt(idea, ans);
+    }
+  } catch(err) {
+    console.warn('AI generation failed, using fallback:', err);
+    promptText = buildFallbackPrompt(idea, ans);
+    showToast('AI generation failed — using structured fallback.');
+  }
+
+  document.getElementById('promptOutput').textContent = promptText;
+  const tokens = Math.round(promptText.length / 4);
+  const sections = (promptText.match(/^\[/gm)||[]).length;
+  document.getElementById('promptMeta').innerHTML = `<span>~${tokens} tokens</span><span>${sections} sections</span><span>{{HISTORY}} + {{QUESTION}}</span>`;
+  document.getElementById('genBtn').disabled = false;
+  document.getElementById('genBtn').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Generate My Prompt`;
+  ['fb-good','fb-bad','fb-redo'].forEach(id=>document.getElementById(id)?.classList.remove('sel'));
+  showStep(3);
+  // ── Grok enrichment (async, non-blocking) ──
+  if (_provider === 'grok' && _apiKey) {
+    const ctx = detectContext(idea);
+    const thinkBar = document.getElementById('grokThinkBar');
+    if (thinkBar) thinkBar.classList.remove('hidden');
+    try {
+      const enhanced = await enrichWithGrok(document.getElementById('promptOutput').textContent, idea, ctx);
+      if (enhanced && enhanced.trim()) {
+        document.getElementById('promptOutput').textContent = enhanced;
+        const newTokens = Math.round(enhanced.length / 4);
+        const sections  = (enhanced.match(/^\[/gm)||[]).length;
+        document.getElementById('promptMeta').innerHTML = `<span>~${newTokens} tokens</span><span>${sections} sections</span><span>✦ Grok Enhanced</span><span>{{HISTORY}} + {{QUESTION}}</span>`;
+        showToast('✦ Prompt enriched with Grok real-world context!');
+      }
+    } catch(err) {
+      console.warn('Grok enrichment failed:', err.message);
+      showToast('Grok enrichment unavailable — showing base prompt.');
+    } finally {
+      if (thinkBar) thinkBar.classList.add('hidden');
+    }
+  }
+}
+
+function buildFallbackPrompt(idea, ans) {
+  const {persona='',audience='',tone='',document:useDocRaw='',constraints='',format='',length='',escalation=''} = ans;
+  const useDoc=!!useDocRaw, docLabel=useDocRaw||'reference document';
+  const personaName=persona?persona.split(',')[0].trim():'AI Assistant';
+  const parts=[];
+
+  let ctx=`[Context]\n`;
+  ctx+=persona?`You will act as ${persona}.\n`:`You are a helpful AI assistant.\n`;
+  ctx+=`Your primary goal: ${idea}.\n`;
+  if(audience) ctx+=`You are responding to: ${audience}.\n`;
+  parts.push(ctx.trim());
+  if(tone) parts.push(`[Tone]\nMaintain a ${tone.toLowerCase()} tone throughout every interaction.`);
+  if(useDoc) parts.push(`[Reference Material]\n<document>\n{{DOCUMENT}}\n</document>\nAlways prioritise this document over general knowledge.`);
+
+  const baseRules=[`- If unsure, say: "I'm not sure — could you clarify?"`,`- If out of scope, politely redirect.`];
+  if(escalation) baseRules.push(`- ${escalation}`);
+  const userRules=constraints?constraints.split('\n').filter(r=>r.trim()).map(r=>`- ${r.trim()}`):[]; 
+  parts.push(`[Rules]\n${[...userRules,...baseRules].join('\n')}`);
+  parts.push(`[Conversation]\n<history>\n{{HISTORY}}\n</history>\n\n<question>\n{{QUESTION}}\n</question>`);
+  parts.push(`[Your Response]\nAs ${personaName}, respond to the user's message.`);
+  parts.push(`[Think step by step]\nBefore replying, consider: the user's actual need, relevant rules, and the best format to help.`);
+
+  let fmtBlock='[Format]\n';
+  fmtBlock+=format?`Format: ${format}.`:`Wrap your response in <response></response> tags.`;
+  if(length) fmtBlock+=`\nLength: ${length}.`;
+  parts.push(fmtBlock);
+
+  return parts.join('\n\n---\n\n');
+}
+
+function applyTplAnswers(answers, qs) {
+  qs.forEach(q=>{
+    const val=answers[q.id]; if(!val) return;
+    if(q.type==='toggle_text') {
+      const chk=document.getElementById(`dq_${q.id}_chk`);
+      const det=document.getElementById(`dq_${q.id}_detail`);
+      const row=document.getElementById(`dq_${q.id}_row`);
+      const inp=document.getElementById(`dq_${q.id}`);
+      if(chk){chk.checked=true;} if(row) row.classList.add('checked');
+      if(det) det.classList.remove('hidden'); if(inp) inp.value=val;
+    } else {
+      const el=document.getElementById(`dq_${q.id}`);
+      if(el) el.value=val;
+    }
+  });
+  updateProg();
+}
+
+/* ══════════════════════════════════════════════════════
+   COPY / DOWNLOAD / RESET
+══════════════════════════════════════════════════════ */
+function copyPrompt() {
+  const text=document.getElementById('promptOutput').textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=document.getElementById('copyBtn'), orig=btn.innerHTML;
+    btn.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Copied!`;
+    showToast('Copied to clipboard!');
+    setTimeout(()=>btn.innerHTML=orig,2000);
+  });
+}
+function downloadPrompt() {
+  const ans=collectAnswers(), name=(ans.persona||'prompt').split(',')[0].trim().replace(/\s+/g,'_');
+  const blob=new Blob([document.getElementById('promptOutput').textContent],{type:'text/plain'});
+  const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(blob),download:`${name}_system_prompt.txt`});
+  a.click(); URL.revokeObjectURL(a.href);
+  showToast('Downloaded!');
+}
+function resetAll() {
+  document.getElementById('ideaInput').value=''; document.getElementById('ideaCount').textContent='0 / 5000';
+  document.getElementById('dynQuestions').innerHTML=''; document.getElementById('questionsWrap').classList.add('hidden');
+  document.getElementById('analyzingState').classList.remove('hidden');
+  window._tplAnswers=null; _lastQs=[];
+  _activeTpl=null; renderTemplateList();
+  showStep(1);
+}
+function onIdeaInput() {
+  const el=document.getElementById('ideaInput'), cnt=document.getElementById('ideaCount');
+  if(el.value.length>5000) el.value=el.value.slice(0,5000);
+  cnt.textContent=`${el.value.length} / 5000`;
+  cnt.classList.toggle('warn',el.value.length>4500);
+}
+function showToast(msg) {
+  document.getElementById('toastMsg').textContent=msg;
+  const t=document.getElementById('toast'); t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function submitFeedback(type) {
+  ['good','bad','redo'].forEach(t=>document.getElementById(`fb-${t}`)?.classList.remove('sel'));
+  document.getElementById(`fb-${type}`)?.classList.add('sel');
+  if(type==='redo') { showToast('Regenerating…'); setTimeout(()=>generatePrompt(),400); }
+  else showToast(type==='good'?'Thanks for the feedback!':'Noted — thanks!');
+}
+
+/* ══════════════════════════════════════════════════════
+   DEPARTMENT TEMPLATES
+══════════════════════════════════════════════════════ */
+const TEMPLATES = [
+  // ── HR ──
+  { key:'hr_onboard',      dept:'hr',       name:'Employee Onboarding',    desc:'Answer new-hire questions on policies, tools & first days',   tag:'HR',        idea:`An AI assistant to help new employees during onboarding. It answers questions about leave policies, company benefits, equipment setup, IT access, first-week schedules, and who to contact for different needs. It should be warm, patient, and direct queries to the right person when unsure.`, answers:{tone:'Friendly & casual', format:'Plain paragraphs'} },
+  { key:'hr_policy',       dept:'hr',       name:'HR Policy Q&A',          desc:'Instant answers on leave, benefits & HR handbook questions',   tag:'HR',        idea:`An AI assistant for employees to ask HR policy questions — annual leave, sick leave, maternity/paternity, expense reimbursement, appraisal process, and company perks. It references the HR handbook and escalates sensitive matters to the HR team.`, answers:{tone:'Professional & formal', document:'HR handbook and policy documents'} },
+  { key:'hr_recruit',      dept:'hr',       name:'Recruitment Assistant',   desc:'Screen candidates & draft interview questions',               tag:'HR',        idea:`An AI recruiting assistant that helps HR screen candidates, draft job descriptions, suggest interview questions, and respond to applicant queries. It maintains a professional, encouraging tone and never discriminates based on personal characteristics.`, answers:{tone:'Professional & formal', format:'Numbered steps'} },
+
+  // ── SALES ──
+  { key:'sales_sdr',       dept:'sales',    name:'SDR Outreach Writer',    desc:'Personalised cold emails & LinkedIn messages',                 tag:'Sales',     idea:`A sales development AI that writes personalised cold outreach emails and LinkedIn messages to prospects. It identifies pain points based on the prospect's role and company, writes compelling subject lines, and keeps messages concise and human.`, answers:{tone:'Direct & concise', format:'Plain paragraphs'} },
+  { key:'sales_objection', dept:'sales',    name:'Objection Handler',      desc:'Counter sales objections with confidence',                     tag:'Sales',     idea:`A sales coaching AI that helps reps handle common objections like "too expensive", "not the right time", "already using a competitor", and "need to think about it". It provides specific, field-tested responses for B2B sales.`, answers:{tone:'Expert & authoritative', format:'Numbered steps'} },
+  { key:'sales_crm',       dept:'sales',    name:'CRM Note Writer',        desc:'Turn call notes into clean CRM summaries',                     tag:'Sales',     idea:`An AI that converts rough sales call notes into clean, structured CRM entries. It extracts: decision maker, pain points, budget, timeline, next steps, and any competitors mentioned.`, answers:{format:'Bullet points / lists', length:'Short (1 paragraph)'} },
+
+  // ── MARKETING ──
+  { key:'mkt_social',      dept:'marketing',name:'Social Media Manager',   desc:'Instagram, LinkedIn & X posts from a brief',                   tag:'Marketing', idea:`A social media content creator that writes platform-specific posts for Instagram, LinkedIn, and X (Twitter). It adapts tone and format for each platform, writes attention-grabbing hooks, and suggests relevant hashtags.`, answers:{tone:'Direct & concise', format:'Numbered steps'} },
+  { key:'mkt_email',       dept:'marketing',name:'Email Campaign Writer',  desc:'Subject lines, body copy & CTAs that convert',                 tag:'Marketing', idea:`An email marketing specialist that writes high-open-rate campaigns including subject lines, preview text, body copy, and CTAs. It knows how to write for both nurture sequences and promotional blasts.`, answers:{tone:'Friendly & casual', format:'Numbered steps'} },
+  { key:'mkt_blog',        dept:'marketing',name:'SEO Blog Writer',        desc:'Google-optimised blog posts with proper structure',             tag:'Marketing', idea:`An SEO content writer that creates blog posts optimised to rank on Google. It uses proper heading structure, integrates target keywords naturally, and writes content that genuinely helps readers while satisfying search intent.`, answers:{tone:'Expert & authoritative', format:'Markdown (headers, bold, code blocks)', length:'Detailed & comprehensive'} },
+
+  // ── SUPPORT ──
+  { key:'sup_saas',        dept:'support',  name:'SaaS Support Agent',     desc:'Handle tickets, billing & troubleshooting queries',             tag:'Support',   idea:`A customer support agent for a SaaS product that handles troubleshooting, billing questions, and feature requests. It follows the refund policy, escalates complex cases to human agents, and always stays calm even with frustrated customers.`, answers:{persona:'Support Specialist', tone:'Friendly & casual', format:'Numbered steps'} },
+  { key:'sup_ecom',        dept:'support',  name:'E-commerce Support',     desc:'Orders, returns, refunds & shipping issues',                    tag:'Support',   idea:`A customer support bot for an e-commerce store handling order status, return requests, refund processing, and shipping delays. It's empathetic, fast, and tries to resolve without escalating.`, answers:{tone:'Warm & empathetic', format:'Plain paragraphs'} },
+  { key:'sup_it',          dept:'support',  name:'IT Helpdesk',            desc:'Internal tech support for employees',                           tag:'Support',   idea:`An internal IT helpdesk assistant that helps employees with common issues: password resets, software installation, VPN setup, printer problems, and account access. It gives clear step-by-step instructions and escalates to the IT team for complex issues.`, answers:{tone:'Friendly & casual', format:'Numbered steps'} },
+
+  // ── FINANCE ──
+  { key:'fin_expense',     dept:'finance',  name:'Expense Policy Advisor', desc:'Answer expense claims, reimbursement & approval questions',     tag:'Finance',   idea:`An AI assistant that helps employees understand the company expense policy — what is claimable, submission deadlines, approval workflows, receipt requirements, and per-diem rates. Always adds a disclaimer to verify with the finance team for unusual claims.`, answers:{tone:'Professional & formal', document:'expense policy document'} },
+  { key:'fin_invoice',     dept:'finance',  name:'Invoice Assistant',      desc:'Draft invoices & answer billing questions',                     tag:'Finance',   idea:`A finance assistant that helps draft professional invoices, answer vendor billing queries, and explain payment terms. It references the company's standard invoice format and payment terms.`, answers:{tone:'Professional & formal', format:'Numbered steps'} },
+
+  // ── LEGAL ──
+  { key:'leg_contract',    dept:'legal',    name:'Contract Reviewer',      desc:'Flag risks & plain-English summaries of contracts',             tag:'Legal',     idea:`A legal AI assistant that reviews contract drafts, highlights unusual or risky clauses, and provides plain-English summaries of key terms — liability, termination, IP ownership, and payment. Always adds a disclaimer that this is not legal advice.`, answers:{tone:'Expert & authoritative', format:'Bullet points / lists', length:'Detailed & comprehensive'} },
+  { key:'leg_compliance',  dept:'legal',    name:'Compliance Q&A',         desc:'GDPR, data privacy & regulatory policy answers',                tag:'Legal',     idea:`An AI compliance assistant that answers internal questions about GDPR, data privacy rules, anti-bribery policy, and regulatory requirements. It references the compliance handbook and always recommends consulting the legal team for complex scenarios.`, answers:{tone:'Professional & formal', document:'compliance handbook'} },
+
+  // ── PRODUCT ──
+  { key:'prod_prd',        dept:'product',  name:'PRD Writer',             desc:'Turn feature ideas into structured product specs',              tag:'Product',   idea:`A product management AI that turns rough feature ideas into structured Product Requirements Documents (PRDs). It covers: problem statement, user stories, success metrics, edge cases, out-of-scope items, and open questions.`, answers:{format:'Markdown (headers, bold, code blocks)', length:'Detailed & comprehensive'} },
+  { key:'prod_feedback',   dept:'product',  name:'User Feedback Analyser', desc:'Extract themes & insights from user feedback',                  tag:'Product',   idea:`A product analyst AI that processes user feedback, support tickets, and NPS responses to identify common themes, top pain points, and feature requests. It groups feedback into categories and suggests priority order.`, answers:{format:'Bullet points / lists', length:'Detailed & comprehensive'} },
+
+  // ── ENGINEERING ──
+  { key:'dev_review',      dept:'dev',      name:'Code Reviewer',          desc:'Security, performance & quality checks on PRs',                tag:'Eng',       idea:`A code review AI for TypeScript and Python that reviews pull requests for security vulnerabilities, performance issues, and code quality. It explains every issue with a reason and suggests a fix.`, answers:{format:'Markdown (headers, bold, code blocks)', length:'Detailed & comprehensive'} },
+  { key:'dev_docs',        dept:'dev',      name:'Technical Docs Writer',  desc:'READMEs, API docs & developer guides',                          tag:'Eng',       idea:`A technical documentation writer that creates clear READMEs, API reference docs, and setup guides. It uses code blocks for every example, keeps language precise, and always includes a Quick Start section.`, answers:{format:'Markdown (headers, bold, code blocks)', audience:'Developers'} },
+
+  // ── OPERATIONS ──
+  { key:'ops_sop',         dept:'ops',      name:'SOP Writer',             desc:'Turn rough processes into clear standard operating procedures',  tag:'Ops',       idea:`An operations AI that turns rough process descriptions into clear, numbered Standard Operating Procedures (SOPs) with a title, purpose, scope, step-by-step instructions, and responsible parties.`, answers:{format:'Numbered steps', length:'Detailed & comprehensive'} },
+  { key:'ops_meeting',     dept:'ops',      name:'Meeting Notes Summariser',desc:'Structured summaries with decisions & action items',           tag:'Ops',       idea:`An AI that turns raw meeting notes or transcripts into structured summaries: key decisions made, action items with owners and deadlines, open questions, and a one-paragraph executive summary.`, answers:{format:'Bullet points / lists', length:'Short (1 paragraph)'} },
+
+  // ── GENERAL ──
+  { key:'gen_assistant',   dept:'general',  name:'General AI Assistant',   desc:'Everyday tasks — writing, research & Q&A',                      tag:'General',   idea:`A friendly AI assistant to help with everyday tasks: drafting emails, summarising articles, answering questions, explaining confusing topics in plain language, and planning. Helpful, clear, and never overwhelming.`, answers:{tone:'Friendly & casual', format:'Plain paragraphs'} },
+  { key:'gen_writer',      dept:'general',  name:'Writing Coach',          desc:'Improve writing, fix grammar & explain every change',            tag:'General',   idea:`An AI writing coach that improves writing by fixing grammar, suggesting better word choices, making text clearer, and explaining every change so the user can learn. It never changes the meaning of what was written.`, answers:{tone:'Warm & empathetic'} },
+];
+
+// ── Additional: Creative / Design / Editorial appended ──
+const EXTRA_TEMPLATES = [
+  // ── CREATIVE ──
+  { key:'cr_copywriter',   dept:'creative', name:'Ad Copywriter',           desc:'High-converting ad copy for Facebook, Google & OOH',             tag:'Creative', idea:`A creative copywriter that writes punchy, high-converting ad copy for Facebook Ads, Google Ads, and out-of-home campaigns. It nails the hook in the first line, speaks directly to the target audience's desire, and always offers 3 variations per request.`, answers:{tone:'Direct & concise', format:'Numbered steps'} },
+  { key:'cr_storytelling', dept:'creative', name:'Brand Storyteller',       desc:'Origin stories, mission copy & About Us pages',                   tag:'Creative', idea:`A brand storytelling AI that helps craft emotionally resonant brand narratives — origin stories, About Us pages, founder bios, and mission statements. It balances personality with purpose and avoids corporate jargon.`, answers:{tone:'Warm & empathetic', format:'Plain paragraphs', length:'Medium (2-4 paragraphs)'} },
+  { key:'cr_script',       dept:'creative', name:'Script & Video Writer',   desc:'YouTube, Reels, TVC & podcast scripts',                           tag:'Creative', idea:`A scriptwriting AI for digital and broadcast content — YouTube videos, Instagram Reels, TVC storyboards, and podcast episodes. It structures scripts with a strong hook, clear narrative arc, and a memorable CTA. Outputs in scene-by-scene format.`, answers:{tone:'Friendly & casual', format:'Numbered steps', length:'Detailed & comprehensive'} },
+  { key:'cr_naming',       dept:'creative', name:'Brand Naming Studio',     desc:'Product names, taglines & campaign slogans',                      tag:'Creative', idea:`A creative naming AI that generates product names, brand taglines, campaign slogans, and event themes. It provides 10 options per prompt, each with a one-line rationale and a score for memorability, relevance, and distinctiveness.`, answers:{tone:'Playful & creative', format:'Numbered steps'} },
+  { key:'cr_ideation',     dept:'creative', name:'Campaign Ideation Partner',desc:'Big ideas, creative territories & campaign concepts',             tag:'Creative', idea:`A creative director AI that helps brainstorm campaign territories, big ideas, and creative concepts. It generates 3–5 distinct creative directions for each brief, each with a territory name, core insight, visual direction, and sample execution.`, answers:{format:'Bullet points / lists', length:'Detailed & comprehensive'} },
+
+  // ── DESIGN ──
+  { key:'des_brief',       dept:'design',   name:'Design Brief Writer',     desc:'Client-ready creative briefs from a rough ask',                   tag:'Design',   idea:`A design brief writer that turns rough client requests into clear, structured creative briefs. It covers: project background, objectives, target audience, deliverables, tone & style guidelines, reference examples, and timeline. Output is clean enough to hand directly to a designer.`, answers:{tone:'Professional & formal', format:'Markdown (headers, bold, code blocks)', length:'Detailed & comprehensive'} },
+  { key:'des_feedback',    dept:'design',   name:'Design Feedback Coach',   desc:'Structured, constructive critique of design work',                 tag:'Design',   idea:`A design critique AI that gives structured, actionable feedback on design work. It evaluates: visual hierarchy, colour use, typography, whitespace, consistency with brand guidelines, and whether the design meets the brief. It frames all feedback constructively.`, answers:{tone:'Expert & authoritative', format:'Bullet points / lists'} },
+  { key:'des_ux',          dept:'design',   name:'UX Research Synthesiser', desc:'Turn user interviews & data into actionable design insights',      tag:'Design',   idea:`A UX research AI that synthesises qualitative user interviews, usability test sessions, and survey data into clear design insights and actionable recommendations. It groups findings by theme and maps them to specific UI improvements.`, answers:{format:'Bullet points / lists', length:'Detailed & comprehensive'} },
+  { key:'des_figma',       dept:'design',   name:'Design System Advisor',   desc:'Naming conventions, tokens & component consistency',              tag:'Design',   idea:`A design system AI that helps teams name Figma components, variants, and design tokens consistently. It follows atomic design principles, suggests naming conventions based on existing patterns, and flags inconsistencies in the current system.`, answers:{tone:'Expert & authoritative', format:'Numbered steps'} },
+  { key:'des_pitch',       dept:'design',   name:'Concept Pitch Builder',   desc:'Present design concepts confidently to clients & stakeholders',    tag:'Design',   idea:`An AI presentation coach for designers pitching concepts to clients or internal stakeholders. It helps structure concept walkthroughs: problem → insight → creative solution → rationale. Keeps language confident and non-defensive.`, answers:{tone:'Professional & formal', format:'Numbered steps', length:'Medium (2-4 paragraphs)'} },
+
+  // ── EDITORIAL ──
+  { key:'ed_editor',       dept:'editorial',name:'Copy Editor',             desc:'Fix grammar, clarity & consistency without changing voice',        tag:'Editorial',idea:`A professional copy editor that improves writing by correcting grammar, fixing awkward sentences, improving clarity, and ensuring consistent style — without changing the author's voice or meaning. It explains every change so writers can learn.`, answers:{tone:'Expert & authoritative', format:'Plain paragraphs'} },
+  { key:'ed_headline',     dept:'editorial',name:'Headline & Hook Writer',  desc:'Scroll-stopping headlines for articles, emails & ads',             tag:'Editorial',idea:`An editorial AI that writes scroll-stopping headlines, email subject lines, and opening hooks. For every brief it produces 10 options across different angles — curiosity, urgency, benefit, controversy, and question formats — then recommends the top 3 with rationale.`, answers:{tone:'Direct & concise', format:'Numbered steps'} },
+  { key:'ed_style',        dept:'editorial',name:'Brand Voice Guardian',    desc:'Apply & enforce a consistent brand tone of voice',                 tag:'Editorial',idea:`A brand voice AI that rewrites or checks content against a defined tone of voice. It flags off-brand language, suggests replacements, and explains why each change better fits the brand's character. Useful for editors approving agency or freelancer copy.`, answers:{tone:'Expert & authoritative', format:'Bullet points / lists', document:'brand voice guidelines'} },
+  { key:'ed_summary',      dept:'editorial',name:'Long-form Summariser',    desc:'Distil reports, papers & articles into executive summaries',        tag:'Editorial',idea:`An editorial AI that distils long-form content — research reports, white papers, articles, and transcripts — into tight executive summaries. Format: one-paragraph TL;DR, 5 key takeaways, and a list of open questions or next actions.`, answers:{format:'Bullet points / lists', length:'Short (1 paragraph)'} },
+  { key:'ed_newsletter',   dept:'editorial',name:'Newsletter Curator',      desc:'Weekly round-ups with your editorial voice',                       tag:'Editorial',idea:`An editorial assistant that curates and writes weekly newsletter editions. It takes a list of links or topics, drafts short editorial commentary for each, writes an intro and outro, and maintains a consistent editorial voice across issues.`, answers:{tone:'Friendly & casual', format:'Plain paragraphs', length:'Medium (2-4 paragraphs)'} },
+];
+TEMPLATES.push(...EXTRA_TEMPLATES);
+
+const DEPTS = [
+  { id:'all',       label:'All Departments',   color:'#6B7280' },
+  { id:'hr',        label:'HR',                color:'#7C3AED' },
+  { id:'sales',     label:'Sales',             color:'#059669' },
+  { id:'marketing', label:'Marketing',         color:'#D97706' },
+  { id:'support',   label:'Support',           color:'#2563EB' },
+  { id:'finance',   label:'Finance',           color:'#DC2626' },
+  { id:'legal',     label:'Legal',             color:'#374151' },
+  { id:'product',   label:'Product',           color:'#DB2777' },
+  { id:'dev',       label:'Engineering',       color:'#0891B2' },
+  { id:'ops',       label:'Operations',        color:'#EA580C' },
+  { id:'creative',  label:'Creative',          color:'#8B5CF6' },
+  { id:'design',    label:'Design',            color:'#EC4899' },
+  { id:'editorial', label:'Editorial',         color:'#0D9488' },
+  { id:'general',   label:'General',           color:'#6B7280' },
+];
+
+let _activeDept = 'all', _activeTpl = null;
+
+function initDeptDropdown() {
+  const sel = document.getElementById('deptSelect');
+  sel.innerHTML = '';
+  DEPTS.forEach(d => {
+    const opt = document.createElement('option');
+    opt.value = d.id;
+    const emoji = { hr:'🧑‍💼', sales:'💰', marketing:'📣', support:'🎧', finance:'📊', legal:'⚖️', product:'🧩', dev:'💻', ops:'⚙️', creative:'🎨', design:'✏️', editorial:'📝', general:'⭐', all:'🔍' };
+    opt.textContent = (emoji[d.id]||'') + ' ' + d.label;
+    sel.appendChild(opt);
+  });
+}
+
+function filterTemplates(dept) {
+  _activeDept = dept;
+  document.getElementById('tplSearch').value = '';
+  renderTemplateList();
+}
+
+function renderTemplateList() {
+  const list  = document.getElementById('tplList');
+  const query = (document.getElementById('tplSearch').value || '').toLowerCase().trim();
+  let filtered = _activeDept === 'all' ? TEMPLATES : TEMPLATES.filter(t => t.dept === _activeDept);
+  if (query) filtered = filtered.filter(t =>
+    t.name.toLowerCase().includes(query) ||
+    t.desc.toLowerCase().includes(query) ||
+    t.dept.toLowerCase().includes(query)
+  );
+
+  const badge = document.getElementById('tplCountBadge');
+  badge.textContent = filtered.length ? `${filtered.length} template${filtered.length === 1 ? '' : 's'}` : '';
+
+  if (!filtered.length) {
+    list.innerHTML = '<div class="tpl-empty">No templates match — type your own idea below!</div>';
+    return;
+  }
+  list.innerHTML = '';
+  filtered.forEach(t => {
+    const dept = DEPTS.find(d => d.id === t.dept);
+    const row  = document.createElement('button');
+    row.type   = 'button';
+    row.className = 'tpl-row' + (t.key === _activeTpl ? ' active' : '');
+    row.dataset.key = t.key;
+    const deptLabel = dept?.label || t.dept;
+    row.innerHTML = `
+      <span class="tpl-row-dot" style="background:${dept?.color || '#6B7280'}"></span>
+      <span class="tpl-row-body">
+        <span class="tpl-row-name">${esc(t.name)}</span>
+        <span class="tpl-row-meta">${esc(t.desc)}</span>
+      </span>
+      ${_activeDept === 'all' ? `<span class="tpl-row-dept">${esc(deptLabel)}</span>` : ''}
+      <span class="tpl-row-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>`;
+    row.onclick = () => loadTemplate(t.key);
+    list.appendChild(row);
+  });
+}
+
+function loadTemplate(key) {
+  const t = TEMPLATES.find(t => t.key === key); if (!t) return;
+  _activeTpl = key;
+  document.getElementById('ideaInput').value = t.idea;
+  onIdeaInput();
+  renderTemplateList();
+  window._tplAnswers = t.answers || {};
+  document.getElementById('ideaInput').scrollIntoView({ behavior:'smooth', block:'center' });
+  showToast(`"${t.name}" loaded — fill in your answers, then click Analyse.`);
+  // Show loaded badge
+  const badge = document.getElementById('tplLoadedBadge');
+  if (badge) {
+    document.getElementById('tplLoadedText').textContent = `"${t.name}" loaded — review the idea below, then click Analyse.`;
+    badge.classList.add('show');
+    setTimeout(() => badge.classList.remove('show'), 4000);
+  }
+}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', () => {
+  initDeptDropdown();
+  renderTemplateList();
+});
+</script>
+</body>
+</html>
